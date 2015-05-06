@@ -1,7 +1,7 @@
 /* Final Project
  * Grade 12
  * Christopher Gregorian
- */ 
+ */
 
 import java.awt.*;
 import java.awt.event.*;
@@ -26,8 +26,8 @@ public class main extends JFrame implements ActionListener {
 		int sizey = 640;
 		setSize(sizex, sizey);
 
-		int fps = 100;
-        myTimer = new Timer(1000/fps, this);
+		int fps = 60;
+        myTimer = new Timer(1000/60, this);
         myTimer.start();
 
         game = new GamePanel(sizex, sizey);
@@ -75,6 +75,9 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 
 		textures = new TextureManager();
 
+		player1 = new Player(640, 320);
+		player2 = new Player(700, 320);
+
 		// Event listeners
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -89,13 +92,13 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	}
 
 	public void mousePressed(MouseEvent e) {
-		click = true;
-		mx = e.getX();
-		my = e.getY();
+		// click = true;
+		// mx = e.getX();
+		// my = e.getY();
 	}
 
 	public void mouseReleased(MouseEvent e) {
-		click = false;
+		// click = false;
 	}
 
 	public void mouseEntered(MouseEvent e) {
@@ -107,8 +110,8 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		mx = e.getX();
-		my = e.getY();
+		// mx = e.getX();
+		// my = e.getY();
 	}
 
 	public void mouseMoved(MouseEvent e) {
@@ -132,13 +135,36 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	}
 
 	public void paintComponent(Graphics g) {
+		playerMove();
+
+		paintBackground(g);
+		// g.setColor(Color.red);
+		paintPlayers(g);
+	}
+
+	public void playerMove() {
+		// Player 1 Movement
+		if (keys[KeyEvent.VK_RIGHT]) {
+			player1.accelerate(1);
+		}
+		if (keys[KeyEvent.VK_LEFT]) {
+			player1.accelerate(-1);
+		}
+
+		player1.move();
+	}
+
+	public void paintBackground(Graphics g) {
 		g.setColor(Color.black);
 		g.fillRect(0, 0, sizex, sizey);
+	}
 
-		// Player 1 Movement
-		if (keys[KeyEvent.VK_UP]) {
-			
-		}
+	public void paintPlayers(Graphics g) {
+		g.setColor(Color.red);
+		g.fillRect(player1.x, player1.y, 32, 32);
+
+		g.setColor(Color.blue);
+		g.fillRect(player2.x, player2.y, 32, 32);
 	}
 }
 
