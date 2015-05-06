@@ -24,6 +24,8 @@ class Player {
 		y = starty;
 
 		velx = vely = 0;
+		maxvelx = 2;
+		maxvely = 5;
 
 		jspeed = 2;
 	}
@@ -36,8 +38,6 @@ class Player {
 		} else if (velx < -2) {
 			velx = -2;
 		}
-
-		// drag();
 	}
 
 	public void jump() {
@@ -45,12 +45,6 @@ class Player {
 	}
 
 	public void drag() {
-		if (velx > 0) {
-			velx -= 0.1;
-		}
-		if (velx < 0) {
-			velx += 0.1;
-		}
 	}
 
 	public void move() {

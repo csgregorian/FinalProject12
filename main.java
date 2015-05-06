@@ -16,6 +16,7 @@ import java.util.HashMap;
 public class main extends JFrame implements ActionListener {
 	Timer myTimer;
 	GamePanel game;
+	private long now=0,cnt=0,st=0;
 
 	public main() {
 		// Sets title
@@ -26,20 +27,26 @@ public class main extends JFrame implements ActionListener {
 		int sizey = 640;
 		setSize(sizex, sizey);
 
-		int fps = 60;
-        myTimer = new Timer(1000/60, this);
-        myTimer.start();
+		
 
         game = new GamePanel(sizex, sizey);
         add(game);
 
+        int fps = 60;
+        myTimer = new Timer(1000/60, this);
+        myTimer.start();
+        st = System.currentTimeMillis();
         setResizable(false);
         setVisible(true);
 	}
 
 	public void actionPerformed(ActionEvent evt) {
-		if (game != null)
-			game.repaint();
+		if (game != null){
+			cnt += 1;
+			game.playerMove();
+			game.repaintz();
+			//System.out.println(cnt *(1000/60)+","+(System.currentTimeMillis()-st));
+		}
 	}
 
 	public static void main(String[] args) {
@@ -56,7 +63,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	private boolean click;
 
 	// Keys pressed
-	private boolean keys[] = new boolean[256];
+	// private boolean keys[] = new boolean[256];
 
 	// Texture manager
 	private TextureManager textures;
@@ -64,14 +71,17 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	// Players
 	private Player player1, player2;
 
+	// Testing
+	private int counter = 0;
+
 	public GamePanel(int x, int y) {
 		sizex = x; sizey = y;
 
 		mx = my = 0;
 		click = false;
 
-		for (int i = 0; i < 256; i++)
-			keys[i] = false;
+		// for (int i = 0; i < 256; i++)
+		// 	keys[i] = false;
 
 		textures = new TextureManager();
 
@@ -123,33 +133,49 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	}
 
 	public void keyPressed(KeyEvent e) {
-		keys[e.getKeyCode()] = true;
-
-		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-			System.exit(0);
+		// keys[e.getKeyCode()] = true;
+		if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+			player1.accelerate(1);
+		} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+			player1.accelerate(-1);
 		}
 	}
 
 	public void keyReleased(KeyEvent e) {
-		keys[e.getKeyCode()] = false;
+		// keys[e.getKeyCode()] = false;
 	}
 
 	public void paintComponent(Graphics g) {
-		playerMove();
+		// paintBackground(g);
 
-		paintBackground(g);
 		// g.setColor(Color.red);
 		paintPlayers(g);
+		System.out.println(++counter);
+	}
+	public void repaintz() {
+		Graphics g = getGraphics();
+		if(g!=null){
+			paintBackground(g);
+
+		// g.setColor(Color.red);
+			paintPlayers(g);
+		}
+		else{
+			System.out.println(++counter);	
+		}
+
+		counter++;
+		//System.out.println(++counter);
 	}
 
 	public void playerMove() {
 		// Player 1 Movement
-		if (keys[KeyEvent.VK_RIGHT]) {
-			player1.accelerate(1);
-		}
-		if (keys[KeyEvent.VK_LEFT]) {
-			player1.accelerate(-1);
-		}
+		// if (keys[KeyEvent.VK_RIGHT]) {
+		// 	player1.accelerate(1);
+		// }
+		// if (keys[KeyEvent.VK_LEFT]) {
+		// 	player1.accelerate(-1);
+		// }
 
 		player1.move();
 	}
