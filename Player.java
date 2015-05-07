@@ -25,6 +25,7 @@ class Player extends Rectangle {
 
 	// Jump/Gravity
 	double jumpy, gravy;
+	boolean inAir;
 
 	// Constants
 	static boolean RIGHT = true, LEFT = false;
@@ -36,27 +37,40 @@ class Player extends Rectangle {
 		width = height = 32;
 
 		velx = vely = 0;
-		maxvelx = 5;
+		maxvelx = 6;
 		maxvely = 5;
-		startvelx = 1;
+		startvelx = 3;
 		startvely = 1;
 
-		accelx = 0.2;
-		decelx = 0.5;
+		accelx = 0.5;
+		decelx = 1;
 
-		jumpy = -6;
+		jumpy = -7;
 		gravy = 0.3;
+		inAir = false;
 	}
 
 	public void accelerate(boolean direction) {
+		/* Changes velocity.
+		 * Run when L/R directional keys are held down */
+
+		// Sets speed to a minimum value
 		if (direction == RIGHT) {
-			velx = Math.max(velx, 1);
+			
+
+			// If the player is in the air, halve their acceleration
+
+			
+			velx = Math.max(velx, startvelx);
 			velx += accelx;
+
+
 		} else {
-			velx = Math.min(velx, -1);
+			velx = Math.min(velx, -startvelx);
 			velx -= accelx;
 		}
 
+		// Caps speed at max and min values
 		if (velx > maxvelx) {
 			velx = maxvelx;
 		} else if (velx < -maxvelx) {
@@ -65,9 +79,15 @@ class Player extends Rectangle {
 	}
 
 	public void drag() {
+		/* Reduces velocity 
+		 * Run when the player is not accelerating */
+
+		// Decreases velocity
 		if (velx > decelx) {
+			// Moving right
 			velx -= decelx;
 		} else if (velx < -decelx) {
+			// Moving left
 			velx += decelx;
 		} else {
 			velx = 0;
@@ -85,25 +105,41 @@ class Player extends Rectangle {
 	public void move(Map map) {
 
 		if (velx > 0) {
-			// Falling
+			// Moving right
+
+			// Checks each block for collision with the right side
 			outer:
 			for (int i = 0; i < velx; i++) {
 				for (Block b : map.blocks) {
 					if (b.intersects(rectRight())) {
+						// Stops player immediately on collision
 						velx = 0;
+
+						if (vely > 0.5) {
+							vely -= 0.5;
+						}
+
 						break outer;
 					}
 				}
 
 				x++;
 			}
-		} else if (velx < 0) {
-			// Jumping
+		} else
+		if (velx < 0) {
+			// Moving left
+
+			// Checks each block for collision with the left side
 			outer:
 			for (int i = 0; i < -velx; i++) {
 				for (Block b : map.blocks) {
 					if (b.intersects(rectLeft())) {
 						velx = 0;
+						
+						if (vely > 0.5) {
+							vely -= 0.5;
+						}
+
 						break outer;
 					}
 				}
@@ -114,18 +150,28 @@ class Player extends Rectangle {
 
 		if (vely > 0) {
 			// Falling
-			outer:
-			for (int i = 0; i < vely; i++) {
-				for (Block b : map.blocks) {
-					if (b.intersects(rectBottom())) {
-						vely = 0;
-						break outer;
+
+			// Labeled block acts as a for/else construct: if the player never
+			// collides with the ground, inAir is set to true
+			outer: {
+				for (int i = 0; i < vely; i++) {
+					for (Block b : map.blocks) {
+						if (b.intersects(rectBottom())) {
+							vely = 0;
+							inAir = false;
+							break outer;
+						}
 					}
+
+					y++;
 				}
 
-				y++;
+				inAir = true;
 			}
-		} else if (vely < 0) {
+
+
+		} else
+		if (vely < 0) {
 			// Jumping
 			outer:
 			for (int i = 0; i < -vely; i++) {
@@ -146,10 +192,8 @@ class Player extends Rectangle {
 	}
 
 	public Rectangle rectLeft() {
-		return new Rectangle(x, y + 2, 1, 28);
+		return new Rectangle(x-1, y + 2, 1, 28);
 	}
-
-
 
 	public Rectangle rectTop() {
 		return new Rectangle(x + 2, y, 28, 1);
@@ -158,6 +202,4 @@ class Player extends Rectangle {
 	public Rectangle rectBottom() {
 		return new Rectangle(x + 2, y + 32, 28, 1);
 	}
-
-
 }

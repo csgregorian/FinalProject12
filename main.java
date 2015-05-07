@@ -45,6 +45,7 @@ public class main extends JFrame implements ActionListener {
 		if (game != null){
 			game.playerMove();
 			game.repaint();
+			// THIS LINE IS MAGICAL DO NOT TOUCH
 			Toolkit.getDefaultToolkit().sync();
 		}
 	}
@@ -185,8 +186,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 
 		if (code == KeyEvent.VK_X) {
 			player1.jump();
-		}
-
+		} else
 		if (code == KeyEvent.VK_S) {
 			player2.jump();
 		}
@@ -230,10 +230,10 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	}
 
 	public void paintBackground(Graphics g) {
-		g.setColor(Color.black);
+		g.setColor(Color.white);
 		g.fillRect(0, 0, sizex, sizey);
 
-		g.setColor(Color.white);
+		g.setColor(Color.black);
 		for (Block b : map.blocks) {
 			fillRect(g, b);
 		}
