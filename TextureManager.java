@@ -14,20 +14,16 @@ class TextureManager {
 		textures = new HashMap();
 	}
 
-	public void addTexture(String filename) {
-		addTexture(filename, filename);
-	}
-
-	public boolean addTexture(String filename, String name) {
-		filename = "resources/" + filename + ".png";
+	public void addTexture(String name, String filename) {
+		filename = "res/" + filename;
 
 		BufferedImage image;
 		try {
 			image = ImageIO.read(new File(filename));
 			textures.put(name, image);
-			return true;
 		} catch (Exception e) {
-			return false;
+			System.err.print(e);
+			System.exit(0);
 		}
 	}
 

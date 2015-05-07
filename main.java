@@ -11,12 +11,13 @@ import java.io.*;
 import javax.imageio.*;
 
 import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 
 public class main extends JFrame implements ActionListener {
 	Timer myTimer;
 	GamePanel game;
-	private long now=0,cnt=0,st=0;
 
 	public main() {
 		// Sets title
@@ -33,19 +34,18 @@ public class main extends JFrame implements ActionListener {
         add(game);
 
         int fps = 60;
-        myTimer = new Timer(1000/60, this);
+        myTimer = new Timer(16, this);
         myTimer.start();
-        st = System.currentTimeMillis();
+
         setResizable(false);
         setVisible(true);
 	}
 
 	public void actionPerformed(ActionEvent evt) {
 		if (game != null){
-			cnt += 1;
 			game.playerMove();
-			game.repaintz();
-			//System.out.println(cnt *(1000/60)+","+(System.currentTimeMillis()-st));
+			game.repaint();
+			Toolkit.getDefaultToolkit().sync();
 		}
 	}
 
@@ -56,23 +56,25 @@ public class main extends JFrame implements ActionListener {
 
 class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
 	// Window size
-	private int sizex, sizey;
+	public int sizex, sizey;
 
 	// Mouse location
-	private int mx, my;
-	private boolean click;
+	public int mx, my;
+	public boolean click;
 
 	// Keys pressed
-	// private boolean keys[] = new boolean[256];
+	public boolean keys[] = new boolean[256];
 
 	// Texture manager
-	private TextureManager textures;
+	public TextureManager textures;
 
 	// Players
-	private Player player1, player2;
+	public Player player1, player2;
 
-	// Testing
-	private int counter = 0;
+	// Maps
+	public HashMap<String, Map> maps;
+	ArrayList<String> map_names;
+	Map map;
 
 	public GamePanel(int x, int y) {
 		sizex = x; sizey = y;
@@ -80,13 +82,18 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		mx = my = 0;
 		click = false;
 
-		// for (int i = 0; i < 256; i++)
-		// 	keys[i] = false;
+		for (int i = 0; i < 256; i++)
+			keys[i] = false;
 
 		textures = new TextureManager();
 
 		player1 = new Player(640, 320);
 		player2 = new Player(700, 320);
+
+		maps = new HashMap<String, Map>();
+		map_names = new ArrayList<String>();
+		loadMaps();
+		map = maps.get("Stage1");
 
 		// Event listeners
 		addMouseListener(this);
@@ -96,19 +103,54 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		setFocusable(true);
 	}
 
+	public void loadMaps() {
+		Scanner map_list;
+		
+
+		// Gets the map names from file
+
+		try {
+			map_list = new Scanner(new File("res/maps/map_list.txt"));
+
+			while (map_list.hasNext()) {
+				map_names.add(map_list.next());
+			}
+
+			map_list.close();
+
+		} catch (FileNotFoundException e) {
+			System.err.println("res/maps/map_list.txt not found");
+			System.exit(0);
+		} catch (Exception e) {
+			System.err.println(e);
+			System.exit(0);
+		}
+
+		// Create the new map objects
+
+		for (String map_name : map_names) {
+			String filename = String.format("maps/%s.png", map_name);
+			textures.addTexture(map_name, filename);
+
+			Map map = new Map(map_name);
+			maps.put(map_name, map);
+		}
+		
+	}
+
 	// Placeholder function overrides for event listeners
 	public void mouseClicked(MouseEvent e) {
 		
 	}
 
 	public void mousePressed(MouseEvent e) {
-		// click = true;
-		// mx = e.getX();
-		// my = e.getY();
+		click = true;
+		mx = e.getX();
+		my = e.getY();
 	}
 
 	public void mouseReleased(MouseEvent e) {
-		// click = false;
+		click = false;
 	}
 
 	public void mouseEntered(MouseEvent e) {
@@ -120,8 +162,8 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		// mx = e.getX();
-		// my = e.getY();
+		mx = e.getX();
+		my = e.getY();
 	}
 
 	public void mouseMoved(MouseEvent e) {
@@ -133,56 +175,68 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	}
 
 	public void keyPressed(KeyEvent e) {
-		// keys[e.getKeyCode()] = true;
-		if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-			player1.accelerate(1);
-		} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-			player1.accelerate(-1);
+		int code = e.getKeyCode();
+
+		keys[code] = true;
+
+		if (code == KeyEvent.VK_ESCAPE) {
+			System.exit(0);
 		}
+
+		if (code == KeyEvent.VK_X) {
+			player1.jump();
+		}
+
+		if (code == KeyEvent.VK_S) {
+			player2.jump();
+		}
+
 	}
 
 	public void keyReleased(KeyEvent e) {
-		// keys[e.getKeyCode()] = false;
+		keys[e.getKeyCode()] = false;
 	}
 
 	public void paintComponent(Graphics g) {
-		// paintBackground(g);
-
-		// g.setColor(Color.red);
+		paintBackground(g);
 		paintPlayers(g);
-		System.out.println(++counter);
-	}
-	public void repaintz() {
-		Graphics g = getGraphics();
-		if(g!=null){
-			paintBackground(g);
-
-		// g.setColor(Color.red);
-			paintPlayers(g);
-		}
-		else{
-			System.out.println(++counter);	
-		}
-
-		counter++;
-		//System.out.println(++counter);
 	}
 
 	public void playerMove() {
 		// Player 1 Movement
-		// if (keys[KeyEvent.VK_RIGHT]) {
-		// 	player1.accelerate(1);
-		// }
-		// if (keys[KeyEvent.VK_LEFT]) {
-		// 	player1.accelerate(-1);
-		// }
+		if (keys[KeyEvent.VK_RIGHT] == keys[KeyEvent.VK_LEFT]) {
+			// XNOR: both or neither are pressed
+			player1.drag();
+		} else if (keys[KeyEvent.VK_RIGHT]) {
+			player1.accelerate(true);
+		} else if (keys[KeyEvent.VK_LEFT]) {
+			player1.accelerate(false);
+		}
 
-		player1.move();
+		player1.move(map);
+		player1.fall();
+
+		if (keys[KeyEvent.VK_L] == keys[KeyEvent.VK_J]) {
+			// XNOR: both or neither are pressed
+			player2.drag();
+		} else if (keys[KeyEvent.VK_L]) {
+			player2.accelerate(true);
+		} else if (keys[KeyEvent.VK_J]) {
+			player2.accelerate(false);
+		}
+
+		player2.move(map);
+		player2.fall();
 	}
 
 	public void paintBackground(Graphics g) {
 		g.setColor(Color.black);
 		g.fillRect(0, 0, sizex, sizey);
+
+		g.setColor(Color.white);
+		for (Block b : map.blocks) {
+			fillRect(g, b);
+		}
 	}
 
 	public void paintPlayers(Graphics g) {
@@ -191,6 +245,10 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 
 		g.setColor(Color.blue);
 		g.fillRect(player2.x, player2.y, 32, 32);
+	}
+
+	public void fillRect(Graphics g, Rectangle rect) {
+		g.fillRect(rect.x, rect.y, rect.width, rect.height);
 	}
 }
 
