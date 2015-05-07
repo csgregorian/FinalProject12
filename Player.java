@@ -25,7 +25,10 @@ class Player extends Rectangle {
 
 	// Jump/Gravity
 	double jumpy, gravy;
-	boolean inAir;
+	int jumps;
+
+	// Collisions
+	boolean touch_right, touch_left, touch_up, touch_down;
 
 	// Constants
 	static boolean RIGHT = true, LEFT = false;
@@ -47,7 +50,9 @@ class Player extends Rectangle {
 
 		jumpy = -7;
 		gravy = 0.3;
-		inAir = false;
+		jumps = 2;
+
+		touch_right = touch_left = touch_up = touch_down = false;
 	}
 
 	public void accelerate(boolean direction) {
@@ -56,11 +61,8 @@ class Player extends Rectangle {
 
 		// Sets speed to a minimum value
 		if (direction == RIGHT) {
-			
-
 			// If the player is in the air, halve their acceleration
 
-			
 			velx = Math.max(velx, startvelx);
 			velx += accelx;
 
@@ -95,7 +97,19 @@ class Player extends Rectangle {
 	}
 
 	public void jump() {
+		jumps--;
 		vely = jumpy;
+
+		if (!touch_down) {
+			if (touch_right) {
+				x--;
+				velx = -10;
+			} else
+			if (touch_left) {
+				x++;
+				velx = 10;
+			}
+		}
 	}
 
 	public void fall() {
@@ -103,48 +117,59 @@ class Player extends Rectangle {
 	}
 
 	public void move(Map map) {
-
 		if (velx > 0) {
 			// Moving right
 
 			// Checks each block for collision with the right side
-			outer:
-			for (int i = 0; i < velx; i++) {
-				for (Block b : map.blocks) {
-					if (b.intersects(rectRight())) {
-						// Stops player immediately on collision
-						velx = 0;
+			outer: {
+				for (int i = 0; i < velx; i++) {
+					for (Block b : map.blocks) {
+						if (b.intersects(rectRight())) {
+							// Stops player immediately on collision
+							velx = 0;
 
-						if (vely > 0.5) {
-							vely -= 0.5;
+							if (vely > 0.5) {
+								vely -= 0.5;
+							}
+
+							touch_right = true;
+							jumps = Math.max(jumps, 1);
+
+							break outer;
 						}
-
-						break outer;
 					}
+
+					x++;
 				}
 
-				x++;
+				touch_right = false;
 			}
 		} else
 		if (velx < 0) {
 			// Moving left
 
 			// Checks each block for collision with the left side
-			outer:
-			for (int i = 0; i < -velx; i++) {
-				for (Block b : map.blocks) {
-					if (b.intersects(rectLeft())) {
-						velx = 0;
-						
-						if (vely > 0.5) {
-							vely -= 0.5;
-						}
+			outer: {
+				for (int i = 0; i < -velx; i++) {
+					for (Block b : map.blocks) {
+						if (b.intersects(rectLeft())) {
+							velx = 0;
+							
+							if (vely > 0.5) {
+								vely -= 0.5;
+							}
 
-						break outer;
+							touch_left = true;
+							jumps = Math.max(jumps, 1);
+
+							break outer;
+						}
 					}
+
+					x--;
 				}
 
-				x--;
+				touch_left = false;
 			}
 		}
 
@@ -152,13 +177,14 @@ class Player extends Rectangle {
 			// Falling
 
 			// Labeled block acts as a for/else construct: if the player never
-			// collides with the ground, inAir is set to true
+			// collides with the ground, touch_down is set to true
 			outer: {
 				for (int i = 0; i < vely; i++) {
 					for (Block b : map.blocks) {
 						if (b.intersects(rectBottom())) {
 							vely = 0;
-							inAir = false;
+							touch_down = true;
+							jumps = 2;
 							break outer;
 						}
 					}
@@ -166,23 +192,25 @@ class Player extends Rectangle {
 					y++;
 				}
 
-				inAir = true;
+				touch_down = false;
 			}
-
-
 		} else
 		if (vely < 0) {
 			// Jumping
-			outer:
-			for (int i = 0; i < -vely; i++) {
-				for (Block b : map.blocks) {
-					if (b.intersects(rectTop())) {
-						vely = 0;
-						break outer;
+			outer: {
+				for (int i = 0; i < -vely; i++) {
+					for (Block b : map.blocks) {
+						if (b.intersects(rectTop())) {
+							vely = 0;
+							touch_up = true;
+							break outer;
+						}
 					}
+
+					y--;
 				}
 
-				y--;
+				touch_up = false;
 			}
 		}
 	}

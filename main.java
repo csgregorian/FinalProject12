@@ -185,10 +185,14 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		}
 
 		if (code == KeyEvent.VK_X) {
-			player1.jump();
+			if (player1.jumps > 0) {
+				player1.jump();
+			}
 		} else
 		if (code == KeyEvent.VK_S) {
-			player2.jump();
+			if (player2.jumps > 0) {
+				player2.jump();
+			}
 		}
 
 	}
