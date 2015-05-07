@@ -10,8 +10,11 @@ import java.util.ArrayList;
 
 class Map {
 	ArrayList<Block> blocks;
+	String name;
 
 	public Map(String name) {
+		this.name = name;
+		
 		blocks = new ArrayList<Block>();
 		String filename = String.format("res/maps/%s.txt", name);
 

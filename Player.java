@@ -193,6 +193,7 @@ class Player extends Rectangle {
 				}
 
 				touch_down = false;
+				jumps = Math.min(jumps, 1);
 			}
 		} else
 		if (vely < 0) {
@@ -213,6 +214,7 @@ class Player extends Rectangle {
 				touch_up = false;
 			}
 		}
+
 	}
 
 	public Rectangle rectRight() {

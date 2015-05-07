@@ -8,9 +8,6 @@ import javax.imageio.*;
 import java.util.HashMap;
 
 class Block extends Rectangle {
-	public Block(String name) {
-
-	}
 
 	public Block(int x, int y) {
 		this.x = x;

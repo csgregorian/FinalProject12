@@ -42,11 +42,12 @@ public class main extends JFrame implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent evt) {
-		if (game != null){
+		if (game != null) {
 			game.playerMove();
 			game.repaint();
 			// THIS LINE IS MAGICAL DO NOT TOUCH
 			Toolkit.getDefaultToolkit().sync();
+			System.out.println(game.player1.jumps);
 		}
 	}
 
@@ -236,6 +237,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	public void paintBackground(Graphics g) {
 		g.setColor(Color.white);
 		g.fillRect(0, 0, sizex, sizey);
+		g.drawImage(textures.getTexture(map.name), 0, 0, this);
 
 		g.setColor(Color.black);
 		for (Block b : map.blocks) {
