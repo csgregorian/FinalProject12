@@ -28,8 +28,7 @@ public class main extends JFrame implements ActionListener {
 		int sizey = 640;
 		setSize(sizex, sizey);
 
-		
-
+	
         game = new GamePanel(sizex, sizey);
         add(game);
 
@@ -44,10 +43,12 @@ public class main extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent evt) {
 		if (game != null) {
 			game.playerMove();
+
+			game.arrowMove();
+
 			game.repaint();
 			// THIS LINE IS MAGICAL DO NOT TOUCH
 			Toolkit.getDefaultToolkit().sync();
-			System.out.println(game.player1.jumps);
 		}
 	}
 
@@ -78,6 +79,10 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	ArrayList<String> map_names;
 	Map map;
 
+	// Arrows
+	public ArrayList<Arrow> arrows;
+	public int arrowspeed;
+
 	public GamePanel(int x, int y) {
 		sizex = x; sizey = y;
 
@@ -96,6 +101,9 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		map_names = new ArrayList<String>();
 		loadMaps();
 		map = maps.get("Stage1");
+
+		arrows = new ArrayList<Arrow>();
+		arrowspeed = 8;
 
 		// Event listeners
 		addMouseListener(this);
@@ -194,6 +202,51 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			if (player2.jumps > 0) {
 				player2.jump();
 			}
+		} else
+
+		if (code == KeyEvent.VK_C) {
+			Arrow a = null;
+			int arrowspeed = 16;
+			if (keys[KeyEvent.VK_DOWN] & !keys[KeyEvent.VK_UP]) {
+				a = new Arrow(player1.x, player1.y, Arrow.DOWN, arrowspeed);
+			} else
+			if (keys[KeyEvent.VK_UP] & !keys[KeyEvent.VK_DOWN]) {
+				a = new Arrow(player1.x, player1.y, Arrow.UP, arrowspeed);
+			} else
+			if (keys[KeyEvent.VK_LEFT] & !keys[KeyEvent.VK_RIGHT]) {
+				a = new Arrow(player1.x, player1.y, Arrow.LEFT, arrowspeed);
+			} else
+			if (keys[KeyEvent.VK_RIGHT] & !keys[KeyEvent.VK_LEFT]) {
+				a = new Arrow(player1.x, player1.y, Arrow.RIGHT, arrowspeed);
+			}
+
+
+			if (a != null) {
+				arrows.add(a);
+				System.out.println(arrows.size());
+			}
+		} else
+
+		if (code == KeyEvent.VK_D) {
+			Arrow a = null;
+
+			if (keys[KeyEvent.VK_K] & !keys[KeyEvent.VK_I]) {
+				a = new Arrow(player2.x, player2.y, Arrow.DOWN, arrowspeed);
+			} else
+			if (keys[KeyEvent.VK_I] & !keys[KeyEvent.VK_K]) {
+				a = new Arrow(player2.x, player2.y, Arrow.UP, arrowspeed);
+			} else
+			if (keys[KeyEvent.VK_J] & !keys[KeyEvent.VK_L]) {
+				a = new Arrow(player2.x, player2.y, Arrow.LEFT, arrowspeed);
+			} else
+			if (keys[KeyEvent.VK_L] & !keys[KeyEvent.VK_J]) {
+				a = new Arrow(player2.x, player2.y, Arrow.RIGHT, arrowspeed);
+			}
+
+
+			if (a != null) {
+				arrows.add(a);
+			}
 		}
 
 	}
@@ -205,6 +258,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	public void paintComponent(Graphics g) {
 		paintBackground(g);
 		paintPlayers(g);
+		paintArrows(g);
 	}
 
 	public void playerMove() {
@@ -234,6 +288,15 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		player2.fall();
 	}
 
+	public void arrowMove() {
+		for (Arrow a : arrows) {
+			a.fall();
+			a.move(map);
+		}
+
+		arrows.removeIf(a -> !a.alive);
+	}
+
 	public void paintBackground(Graphics g) {
 		g.setColor(Color.white);
 		g.fillRect(0, 0, sizex, sizey);
@@ -251,6 +314,13 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 
 		g.setColor(Color.blue);
 		g.fillRect(player2.x, player2.y, 32, 32);
+	}
+
+	public void paintArrows(Graphics g) {
+		g.setColor(Color.green);
+		for (Arrow a : arrows) {
+			fillRect(g, a);
+		}
 	}
 
 	public void fillRect(Graphics g, Rectangle rect) {

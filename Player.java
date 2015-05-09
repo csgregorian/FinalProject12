@@ -9,11 +9,6 @@ import java.util.HashMap;
 
 
 class Player extends Rectangle {
-	// Location
-	int x, y;
-
-	// Size
-	int width, height;
 
 	// Velocity
 	double velx, vely;
@@ -30,8 +25,11 @@ class Player extends Rectangle {
 	// Collisions
 	boolean touch_right, touch_left, touch_up, touch_down;
 
+	// Arrows
+	int arrows;
+
 	// Constants
-	static boolean RIGHT = true, LEFT = false;
+	final static boolean RIGHT = true, LEFT = false;
 
 	public Player(int startx, int starty) {
 		x = startx;
@@ -53,6 +51,8 @@ class Player extends Rectangle {
 		jumps = 2;
 
 		touch_right = touch_left = touch_up = touch_down = false;
+
+		arrows = 8;
 	}
 
 	public void accelerate(boolean direction) {
@@ -143,6 +143,7 @@ class Player extends Rectangle {
 				}
 
 				touch_right = false;
+				touch_left = false;
 			}
 		} else
 		if (velx < 0) {
@@ -170,7 +171,11 @@ class Player extends Rectangle {
 				}
 
 				touch_left = false;
+				touch_right = false;
 			}
+		} else {
+			// touch_left = false;
+			// touch_right = false;
 		}
 
 		if (vely > 0) {
