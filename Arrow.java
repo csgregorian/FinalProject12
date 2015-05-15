@@ -13,13 +13,14 @@ class Arrow extends Rectangle {
 	// Constants
 	final static int RIGHT = 0, LEFT = 1, DOWN = 2, UP = 3;
 
-	double velx, vely;
+	double velx = 0,
+		   vely = 0;
 
-	double gravy;
+	double gravy = 0.2;
 
 	int direction;
 
-	boolean alive;
+	boolean alive = true;
 
 
 
@@ -29,12 +30,6 @@ class Arrow extends Rectangle {
 		 * have a size of 32*16 when horizontal and 16*32 when vertical */
 
 		direction = dir;
-
-		velx = vely = 0;
-
-		gravy = 0.2;
-
-		alive = true;
 
 		if (direction == RIGHT) {
 			x = startx + 32;
@@ -118,6 +113,13 @@ class Arrow extends Rectangle {
 			}
 		}
 
+		if (x < 0) {
+			x += 1280;
+		} else
+		if (x >= 1279) {
+			x -= 1280;
+		}
+
 		if (vely > 0) {
 			// Falling
 
@@ -151,6 +153,13 @@ class Arrow extends Rectangle {
 					y--;
 				}
 			}
+		}
+
+		if (y < 0) {
+			y += 640;
+		} else
+		if (y >= 640) {
+			y -= 640;
 		}
 	}
 }

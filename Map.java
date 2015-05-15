@@ -25,11 +25,12 @@ class Map {
 
 
 			for (int y = 0; y < 20; y++) {	
-				for (int x = 0; x < 32; x++) {
+				for (int x = 0; x < 40; x++) {
 					char c = (char)(block_file.read());
 					if (c == '\n') {
-						block_file.read();
-					} else if (c == '1') {
+						c = (char)(block_file.read());
+					}
+					if (c == '1') {
 						blocks.add(new Block(x * 32, y * 32));
 					}
 				}

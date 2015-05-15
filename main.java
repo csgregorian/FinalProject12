@@ -10,30 +10,31 @@ import java.awt.image.*;
 import java.io.*;
 import javax.imageio.*;
 
+import static java.awt.event.KeyEvent.*;
+
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 
 public class main extends JFrame implements ActionListener {
-	Timer myTimer;
-	GamePanel game;
+	int fps = 60;
+	Timer myTimer = new Timer(16, this);
+
+	int sizex = 1280;
+	int sizey = 640;
+
+	GamePanel game = new GamePanel(sizex, sizey);
 
 	public main() {
 		// Sets title
 		super("Towerfall: Ascension");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		int sizex = 1280;
-		int sizey = 640;
 		setSize(sizex, sizey);
 
-	
-        game = new GamePanel(sizex, sizey);
         add(game);
 
-        int fps = 60;
-        myTimer = new Timer(16, this);
         myTimer.start();
 
         setResizable(false);
@@ -59,51 +60,43 @@ public class main extends JFrame implements ActionListener {
 
 class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
 	// Window size
-	public int sizex, sizey;
+	int sizex, sizey;
 
 	// Mouse location
-	public int mx, my;
-	public boolean click;
+	int mx = 0,
+	    my = 0;
+	boolean click = false;
 
 	// Keys pressed
-	public boolean keys[] = new boolean[256];
+	boolean keys[] = new boolean[256];
 
 	// Texture manager
-	public TextureManager textures;
+	TextureManager textures = new TextureManager();
 
 	// Players
-	public Player player1, player2;
+	Player player1 = new Player(640, 320),
+		   player2 = new Player(700, 320);
 
 	// Maps
-	public HashMap<String, Map> maps;
-	ArrayList<String> map_names;
+	HashMap<String, Map> maps = new HashMap<>();
+	ArrayList<String> map_names = new ArrayList<>();
 	Map map;
 
 	// Arrows
-	public ArrayList<Arrow> arrows;
-	public int arrowspeed;
+	ArrayList<Arrow> arrows = new ArrayList<>();
+	int arrowspeed = 16;
+
+	// Constants
+	final static int RIGHT = 0, LEFT = 1, DOWN = 2, UP = 3;
 
 	public GamePanel(int x, int y) {
 		sizex = x; sizey = y;
 
-		mx = my = 0;
-		click = false;
-
 		for (int i = 0; i < 256; i++)
 			keys[i] = false;
 
-		textures = new TextureManager();
-
-		player1 = new Player(640, 320);
-		player2 = new Player(700, 320);
-
-		maps = new HashMap<String, Map>();
-		map_names = new ArrayList<String>();
 		loadMaps();
 		map = maps.get("Stage1");
-
-		arrows = new ArrayList<Arrow>();
-		arrowspeed = 8;
 
 		// Event listeners
 		addMouseListener(this);
@@ -115,7 +108,6 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 
 	public void loadMaps() {
 		Scanner map_list;
-		
 
 		// Gets the map names from file
 
@@ -189,64 +181,87 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 
 		keys[code] = true;
 
-		if (code == KeyEvent.VK_ESCAPE) {
-			System.exit(0);
-		}
+		Arrow a = null;
 
-		if (code == KeyEvent.VK_X) {
-			if (player1.jumps > 0) {
+		switch (code) {
+			case VK_ESCAPE:
+				System.exit(0);
+				break;
+
+			case VK_X:
 				player1.jump();
-			}
-		} else
-		if (code == KeyEvent.VK_S) {
-			if (player2.jumps > 0) {
+				break;
+			case VK_S:
 				player2.jump();
-			}
-		} else
+				break;
 
-		if (code == KeyEvent.VK_C) {
-			Arrow a = null;
-			int arrowspeed = 16;
-			if (keys[KeyEvent.VK_DOWN] & !keys[KeyEvent.VK_UP]) {
-				a = new Arrow(player1.x, player1.y, Arrow.DOWN, arrowspeed);
-			} else
-			if (keys[KeyEvent.VK_UP] & !keys[KeyEvent.VK_DOWN]) {
-				a = new Arrow(player1.x, player1.y, Arrow.UP, arrowspeed);
-			} else
-			if (keys[KeyEvent.VK_LEFT] & !keys[KeyEvent.VK_RIGHT]) {
-				a = new Arrow(player1.x, player1.y, Arrow.LEFT, arrowspeed);
-			} else
-			if (keys[KeyEvent.VK_RIGHT] & !keys[KeyEvent.VK_LEFT]) {
-				a = new Arrow(player1.x, player1.y, Arrow.RIGHT, arrowspeed);
-			}
+			case VK_RIGHT:
+				player1.last_input = RIGHT;
+				break;
+			case VK_LEFT:
+				player1.last_input = LEFT;
+				break;
+			case VK_DOWN:
+				player1.last_input = DOWN;
+				break;
+			case VK_UP:
+				player1.last_input = UP;
+				break;
 
+			case VK_L:
+				player2.last_input = RIGHT;
+				break;
+			case VK_J:
+				player2.last_input = LEFT;
+				break;
+			case VK_K:
+				player2.last_input = DOWN;
+				break;
+			case VK_I:
+				player2.last_input = UP;
+				break;
 
-			if (a != null) {
-				arrows.add(a);
-				System.out.println(arrows.size());
-			}
-		} else
+			case VK_C:
+				if (keys[VK_DOWN] & !keys[VK_UP]) {
+					a = new Arrow(player1.x, player1.y, Arrow.DOWN, arrowspeed);
+				} else
+				if (keys[VK_UP] & !keys[VK_DOWN]) {
+					a = new Arrow(player1.x, player1.y, Arrow.UP, arrowspeed);
+				} else
+				if (keys[VK_LEFT] & !keys[VK_RIGHT]) {
+					a = new Arrow(player1.x, player1.y, Arrow.LEFT, arrowspeed);
+				} else
+				if (keys[VK_RIGHT] & !keys[VK_LEFT]) {
+					a = new Arrow(player1.x, player1.y, Arrow.RIGHT, arrowspeed);
+				}
 
-		if (code == KeyEvent.VK_D) {
-			Arrow a = null;
+				if (a != null) {
+					arrows.add(a);
+					System.out.println(arrows.size());
+				}
+				break;
 
-			if (keys[KeyEvent.VK_K] & !keys[KeyEvent.VK_I]) {
-				a = new Arrow(player2.x, player2.y, Arrow.DOWN, arrowspeed);
-			} else
-			if (keys[KeyEvent.VK_I] & !keys[KeyEvent.VK_K]) {
-				a = new Arrow(player2.x, player2.y, Arrow.UP, arrowspeed);
-			} else
-			if (keys[KeyEvent.VK_J] & !keys[KeyEvent.VK_L]) {
-				a = new Arrow(player2.x, player2.y, Arrow.LEFT, arrowspeed);
-			} else
-			if (keys[KeyEvent.VK_L] & !keys[KeyEvent.VK_J]) {
-				a = new Arrow(player2.x, player2.y, Arrow.RIGHT, arrowspeed);
-			}
+			case VK_D:
+				if (keys[VK_K] & !keys[VK_I]) {
+					a = new Arrow(player2.x, player2.y, Arrow.DOWN, arrowspeed);
+				} else
+				if (keys[VK_I] & !keys[VK_K]) {
+					a = new Arrow(player2.x, player2.y, Arrow.UP, arrowspeed);
+				} else
+				if (keys[VK_J] & !keys[VK_L]) {
+					a = new Arrow(player2.x, player2.y, Arrow.LEFT, arrowspeed);
+				} else
+				if (keys[VK_L] & !keys[VK_J]) {
+					a = new Arrow(player2.x, player2.y, Arrow.RIGHT, arrowspeed);
+				}
+				
+				if (a != null) {
+					arrows.add(a);
+				}
+				break;
 
-
-			if (a != null) {
-				arrows.add(a);
-			}
+			default:
+				break;
 		}
 
 	}
@@ -267,9 +282,9 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			// XNOR: both or neither are pressed
 			player1.drag();
 		} else if (keys[KeyEvent.VK_RIGHT]) {
-			player1.accelerate(true);
+			player1.accelerate(RIGHT);
 		} else if (keys[KeyEvent.VK_LEFT]) {
-			player1.accelerate(false);
+			player1.accelerate(LEFT);
 		}
 
 		player1.move(map);
@@ -279,9 +294,9 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			// XNOR: both or neither are pressed
 			player2.drag();
 		} else if (keys[KeyEvent.VK_L]) {
-			player2.accelerate(true);
+			player2.accelerate(RIGHT);
 		} else if (keys[KeyEvent.VK_J]) {
-			player2.accelerate(false);
+			player2.accelerate(LEFT);
 		}
 
 		player2.move(map);
@@ -292,6 +307,16 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		for (Arrow a : arrows) {
 			a.fall();
 			a.move(map);
+
+			if (a.intersects(player1)) {
+				player1.hurt();
+				a.alive = false;
+			}
+			
+			if (a.intersects(player2)) {
+				player2.hurt();
+				a.alive = false;
+			}
 		}
 
 		arrows.removeIf(a -> !a.alive);
@@ -309,11 +334,24 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	}
 
 	public void paintPlayers(Graphics g) {
-		g.setColor(Color.red);
-		g.fillRect(player1.x, player1.y, 32, 32);
+		g.setColor(Color.green);
+		fillRect(g, player1);
+		g.fillRect(player1.x+1280, player1.y, 32, 32);
+		g.fillRect(player1.x-1280, player1.y, 32, 32);
+		g.fillRect(player1.x, player1.y-640, 32, 32);
+		g.fillRect(player1.x, player1.y+640, 32, 32);
+
 
 		g.setColor(Color.blue);
-		g.fillRect(player2.x, player2.y, 32, 32);
+		fillRect(g, player2);
+		g.fillRect(player2.x+1280, player2.y, 32, 32);
+		g.fillRect(player2.x-1280, player2.y, 32, 32);
+		g.fillRect(player2.x, player2.y-640, 32, 32);
+		g.fillRect(player2.x, player2.y+640, 32, 32);
+
+		g.setColor(Color.red);
+		g.fillRect(player1.x, player1.y, player1.hp*8, 4);
+		g.fillRect(player2.x, player2.y, player2.hp*8, 4);
 	}
 
 	public void paintArrows(Graphics g) {

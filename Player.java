@@ -9,53 +9,50 @@ import java.util.HashMap;
 
 
 class Player extends Rectangle {
-
 	// Velocity
-	double velx, vely;
-	double maxvelx, maxvely;
-	double startvelx, startvely;
+	double velx = 0,
+		   vely = 0,
+		   maxvelx = 6,
+		   maxvely = 5,
+	       startvelx = 3,
+	       startvely = 1;
 
 	// Acceleration/Deceleration
-	double accelx, decelx;
+	double accelx = 0.5,
+		   decelx = 1;
 
 	// Jump/Gravity
-	double jumpy, gravy;
-	int jumps;
+	double jumpy = -7,
+		   gravy = 0.3;
+	int jumps = 2;
 
 	// Collisions
 	boolean touch_right, touch_left, touch_up, touch_down;
 
 	// Arrows
-	int arrows;
+	int arrows = 8;
+
+	// Last input
+	int last_input = -1;
+
+	// Health
+	int hp = 4;
+	boolean alive = true;
 
 	// Constants
-	final static boolean RIGHT = true, LEFT = false;
+	final static int RIGHT = 0, LEFT = 1, DOWN = 2, UP = 3;
 
 	public Player(int startx, int starty) {
 		x = startx;
 		y = starty;
 
-		width = height = 32;
-
-		velx = vely = 0;
-		maxvelx = 6;
-		maxvely = 5;
-		startvelx = 3;
-		startvely = 1;
-
-		accelx = 0.5;
-		decelx = 1;
-
-		jumpy = -7;
-		gravy = 0.3;
-		jumps = 2;
+		width = 32;
+		height = 32;
 
 		touch_right = touch_left = touch_up = touch_down = false;
-
-		arrows = 8;
 	}
 
-	public void accelerate(boolean direction) {
+	public void accelerate(int direction) {
 		/* Changes velocity.
 		 * Run when L/R directional keys are held down */
 
@@ -67,7 +64,7 @@ class Player extends Rectangle {
 			velx += accelx;
 
 
-		} else {
+		} else if (direction == LEFT) {
 			velx = Math.min(velx, -startvelx);
 			velx -= accelx;
 		}
@@ -97,6 +94,10 @@ class Player extends Rectangle {
 	}
 
 	public void jump() {
+		if (jumps == 0) {
+			return;
+		}
+
 		jumps--;
 		vely = jumpy;
 
@@ -173,9 +174,13 @@ class Player extends Rectangle {
 				touch_left = false;
 				touch_right = false;
 			}
-		} else {
-			// touch_left = false;
-			// touch_right = false;
+		}
+
+		if (x < 0) {
+			x += 1280;
+		} else
+		if (x >= 1279) {
+			x -= 1280;
 		}
 
 		if (vely > 0) {
@@ -219,22 +224,36 @@ class Player extends Rectangle {
 				touch_up = false;
 			}
 		}
+		
 
+		if (y < 0) {
+			y += 640;
+		} else
+		if (y >= 640) {
+			y -= 640;
+		}
+	}
+
+	public void hurt() {
+		hp--;
+		if (hp <= 0) {
+			alive = false;
+		}
 	}
 
 	public Rectangle rectRight() {
-		return new Rectangle(x + 32, y + 2, 1, 28);
+		return new Rectangle(x + 32, y + 1, 1, 30);
 	}
 
 	public Rectangle rectLeft() {
-		return new Rectangle(x-1, y + 2, 1, 28);
+		return new Rectangle(x-1, y + 1, 1, 30);
 	}
 
 	public Rectangle rectTop() {
-		return new Rectangle(x + 2, y, 28, 1);
+		return new Rectangle(x, y, 32, 1);
 	}
 
 	public Rectangle rectBottom() {
-		return new Rectangle(x + 2, y + 32, 28, 1);
+		return new Rectangle(x + 1, y + 32, 30, 1);
 	}
 }
