@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-class Arrow extends Rectangle {
+class Arrow extends Rectangle implements Constants {
 	// Constants
 	final static int RIGHT = 0, LEFT = 1, DOWN = 2, UP = 3;
 
@@ -23,7 +23,6 @@ class Arrow extends Rectangle {
 	boolean alive = true;
 
 
-
 	public Arrow(int startx, int starty, int dir, int vel) {
 		/* Constructs the arrow one tile over in the given direction
 		 * from the source tile.  Arrows are centred in the tile and
@@ -33,7 +32,7 @@ class Arrow extends Rectangle {
 
 		if (direction == RIGHT) {
 			x = startx + 32;
-			y = starty + 8;
+			y = starty;
 
 			width = 32;
 			height = 16;
@@ -42,7 +41,7 @@ class Arrow extends Rectangle {
 		} else
 		if (direction == LEFT) {
 			x = startx - 32;
-			y = starty + 8;
+			y = starty;
 
 			width = 32;
 			height = 16;

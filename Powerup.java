@@ -7,11 +7,14 @@ import javax.imageio.*;
 
 import java.util.HashMap;
 
-class Block extends Rectangle implements Constants {
+class Powerup extends Rectangle implements Constants {
+	int type = 0;
 
-	public Block(int x, int y) {
+	public Powerup(int x, int y, int type) {
 		this.x = x;
 		this.y = y;
+
+		this.type = type;
 
 		width = height = 32;
 	}

@@ -7,8 +7,7 @@ import javax.imageio.*;
 
 import java.util.HashMap;
 
-
-class Player extends Rectangle {
+class Player extends Rectangle implements Constants {
 	// Velocity
 	double velx = 0,
 		   vely = 0,
@@ -29,6 +28,9 @@ class Player extends Rectangle {
 	// Collisions
 	boolean touch_right, touch_left, touch_up, touch_down;
 
+	// Time
+	int timer = 0;
+
 	// Arrows
 	int arrows = 8;
 
@@ -39,8 +41,13 @@ class Player extends Rectangle {
 	int hp = 4;
 	boolean alive = true;
 
+	// Powerups
+	int powerup = 0;
+	int powerup_timer = 0;
+
 	// Constants
 	final static int RIGHT = 0, LEFT = 1, DOWN = 2, UP = 3;
+	final static int NONE = 0, SPEED = 1, JUMP = 2, BULLET = 3;
 
 	public Player(int startx, int starty) {
 		x = startx;
@@ -50,6 +57,10 @@ class Player extends Rectangle {
 		height = 32;
 
 		touch_right = touch_left = touch_up = touch_down = false;
+	}
+
+	public void tick() {
+		timer++;
 	}
 
 	public void accelerate(int direction) {
@@ -126,7 +137,7 @@ class Player extends Rectangle {
 				for (int i = 0; i < velx; i++) {
 					for (Block b : map.blocks) {
 						if (b.intersects(rectRight())) {
-							// Stops player immediately on collision
+							// Hits block on right
 							velx = 0;
 
 							if (vely > 0.5) {
@@ -140,9 +151,12 @@ class Player extends Rectangle {
 						}
 					}
 
+					// Moves right
 					x++;
+					getPowerup(map);
 				}
 
+				// No collision on right
 				touch_right = false;
 				touch_left = false;
 			}
@@ -155,6 +169,7 @@ class Player extends Rectangle {
 				for (int i = 0; i < -velx; i++) {
 					for (Block b : map.blocks) {
 						if (b.intersects(rectLeft())) {
+							// Hits block on left
 							velx = 0;
 							
 							if (vely > 0.5) {
@@ -168,14 +183,18 @@ class Player extends Rectangle {
 						}
 					}
 
+					// Moves left
 					x--;
+					getPowerup(map);
 				}
 
+				// No collision on left
 				touch_left = false;
 				touch_right = false;
 			}
 		}
 
+		// Horizontal loop adjustment
 		if (x < 0) {
 			x += 1280;
 		} else
@@ -192,6 +211,7 @@ class Player extends Rectangle {
 				for (int i = 0; i < vely; i++) {
 					for (Block b : map.blocks) {
 						if (b.intersects(rectBottom())) {
+							// Hits block on bottom
 							vely = 0;
 							touch_down = true;
 							jumps = 2;
@@ -199,9 +219,12 @@ class Player extends Rectangle {
 						}
 					}
 
+					// Moves down
 					y++;
+					getPowerup(map);
 				}
 
+				// No collision on bottom
 				touch_down = false;
 				jumps = Math.min(jumps, 1);
 			}
@@ -212,15 +235,19 @@ class Player extends Rectangle {
 				for (int i = 0; i < -vely; i++) {
 					for (Block b : map.blocks) {
 						if (b.intersects(rectTop())) {
+							// Hits block on top
 							vely = 0;
 							touch_up = true;
 							break outer;
 						}
 					}
 
+					// Moves up
 					y--;
+					getPowerup(map);
 				}
 
+				// No collision on top
 				touch_up = false;
 			}
 		}
@@ -241,8 +268,16 @@ class Player extends Rectangle {
 		}
 	}
 
+	public void getPowerup(Map map) {
+		
+	}
+
+	public void checkPowerup() {
+		
+	}
+
 	public Rectangle rectRight() {
-		return new Rectangle(x + 32, y + 1, 1, 30);
+		return new Rectangle(x + 32, y, 1, 31);
 	}
 
 	public Rectangle rectLeft() {
@@ -254,6 +289,6 @@ class Player extends Rectangle {
 	}
 
 	public Rectangle rectBottom() {
-		return new Rectangle(x + 1, y + 32, 30, 1);
+		return new Rectangle(x, y + 32, 32, 1);
 	}
 }

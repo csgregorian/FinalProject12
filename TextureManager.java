@@ -7,7 +7,7 @@ import javax.imageio.*;
 
 import java.util.HashMap;
 
-class TextureManager {
+class TextureManager implements Constants {
 	private HashMap<String, BufferedImage> textures;
 
 	public TextureManager() {
