@@ -27,8 +27,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	TextureManager textures = new TextureManager();
 
 	// Players
-	Player player1 = new Player(640, 320),
-		   player2 = new Player(700, 320);
+	Player player1 = new Player(6*32, 5*32),
+		   player2 = new Player(34*32, 5*32);
 
 	// Maps
 	HashMap<String, Map> maps = new HashMap<>();
@@ -83,7 +83,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 		// Create the new map objects
 		for (String map_name : map_names) {
-			String filename = String.format("maps/%s.png", map_name);
+			String filename = String.format("res/maps/%s.png", map_name);
+			System.out.println(filename);
 			textures.addTexture(map_name, filename);
 
 			Map map = new Map(map_name);
@@ -189,7 +190,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 				if (a != null) {
 					arrows.add(a);
-					System.out.println(arrows.size());
 				}
 				break;
 
@@ -280,13 +280,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public void paintBackground(Graphics g) {
 		g.setColor(Color.white);
-		g.fillRect(0, 0, sizex, sizey);
+		// g.fillRect(0, 0, sizex, sizey);
 		g.drawImage(textures.getTexture(map.name), 0, 0, this);
 
 		g.setColor(Color.black);
-		for (Block b : map.blocks) {
-			fillRect(g, b);
-		}
+		// for (Block b : map.blocks) {
+		// 	fillRect(g, b);
+		// }
+
 	}
 
 	public void paintPlayers(Graphics g) {

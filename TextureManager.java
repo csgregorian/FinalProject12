@@ -11,18 +11,16 @@ class TextureManager implements Constants {
 	private HashMap<String, BufferedImage> textures;
 
 	public TextureManager() {
-		textures = new HashMap();
+		textures = new HashMap<String, BufferedImage>();
 	}
 
 	public void addTexture(String name, String filename) {
-		filename = "res/" + filename;
-
 		BufferedImage image;
 		try {
-			image = ImageIO.read(new File(filename));
+			image = new BufferedImage(ImageIO.read(new FileInputStream(new File(filename))));
 			textures.put(name, image);
 		} catch (Exception e) {
-			System.err.print(e);
+			System.err.print("ADDTEXTURE BROKE");
 			System.exit(0);
 		}
 	}
