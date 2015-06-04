@@ -17,7 +17,7 @@ class TextureManager implements Constants {
 	public void addTexture(String name, String filename) {
 		BufferedImage image;
 		try {
-			image = new BufferedImage(ImageIO.read(new FileInputStream(new File(filename))));
+			image = ImageIO.read(new File(filename));
 			textures.put(name, image);
 		} catch (Exception e) {
 			System.err.print("ADDTEXTURE BROKE");

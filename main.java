@@ -68,6 +68,8 @@ public class main extends JFrame implements ActionListener, Constants {
 	}
 
 	public static void main(String[] args) {
+		Rectangle r1 = new Rectangle(10, 10, 10, 10);
+		Rectangle r2 = new Rectangle(0, 0, 10, 10);
 		main frame = new main();
 	}
 }

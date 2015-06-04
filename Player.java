@@ -153,6 +153,14 @@ class Player extends Rectangle implements Constants {
 
 					// Moves right
 					x++;
+
+					if (x < 0) {
+						x += 1280;
+					} else
+					if (x >= 1279) {
+						x -= 1280;
+					}
+
 					getPowerup(map);
 				}
 
@@ -185,6 +193,14 @@ class Player extends Rectangle implements Constants {
 
 					// Moves left
 					x--;
+
+					if (x < 0) {
+						x += 1280;
+					} else
+					if (x >= 1279) {
+						x -= 1280;
+					}
+
 					getPowerup(map);
 				}
 
@@ -195,12 +211,7 @@ class Player extends Rectangle implements Constants {
 		}
 
 		// Horizontal loop adjustment
-		if (x < 0) {
-			x += 1280;
-		} else
-		if (x >= 1279) {
-			x -= 1280;
-		}
+		
 
 		if (vely > 0) {
 			// Falling
@@ -221,6 +232,14 @@ class Player extends Rectangle implements Constants {
 
 					// Moves down
 					y++;
+
+					if (y < 0) {
+						y += 640;
+					} else
+					if (y >= 640) {
+						y -= 640;
+					}
+
 					getPowerup(map);
 				}
 
@@ -244,6 +263,14 @@ class Player extends Rectangle implements Constants {
 
 					// Moves up
 					y--;
+					
+					if (y < 0) {
+						y += 640;
+					} else
+					if (y >= 640) {
+						y -= 640;
+					}
+
 					getPowerup(map);
 				}
 
@@ -253,12 +280,7 @@ class Player extends Rectangle implements Constants {
 		}
 		
 
-		if (y < 0) {
-			y += 640;
-		} else
-		if (y >= 640) {
-			y -= 640;
-		}
+		
 	}
 
 	public void hurt() {
