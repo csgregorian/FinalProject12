@@ -1,5 +1,9 @@
 public interface Constants {
 	/* Shared global interface between all classes */
+
+	// Tiles
+	final static int TILESIZE = 32, TILEX = 40, TILEY = 20;
+
 	// Directions
 	final static int RIGHT = 0, LEFT = 1, DOWN = 2, UP = 3;
 

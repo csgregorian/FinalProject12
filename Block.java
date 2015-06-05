@@ -13,6 +13,6 @@ class Block extends Rectangle implements Constants {
 		this.x = x;
 		this.y = y;
 
-		width = height = 32;
+		width = height = TILESIZE;
 	}
 }

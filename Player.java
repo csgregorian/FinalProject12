@@ -290,6 +290,11 @@ class Player extends Rectangle implements Constants {
 		}
 	}
 
+	public void knockback(Arrow a) {
+		velx += a.velx;
+		vely += a.vely;
+	}
+
 	public void getPowerup(Map map) {
 		
 	}

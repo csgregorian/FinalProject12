@@ -29,14 +29,14 @@ class Map implements Constants {
 		try {
 			block_file = new BufferedReader(new FileReader(filename));
 
-			for (int y = 0; y < 20; y++) {	
-				for (int x = 0; x < 40; x++) {
+			for (int y = 0; y < TILEY; y++) {	
+				for (int x = 0; x < TILEX; x++) {
 					char c = (char)(block_file.read());
 					if (c == '\n') {
 						c = (char)(block_file.read());
 					}
-					if (c == '1') {
-						blocks.add(new Block(x * 32, y * 32));
+					if (c == 'O') {
+						blocks.add(new Block(x * TILESIZE, y * TILESIZE));
 					}
 				}
 			}

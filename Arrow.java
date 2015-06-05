@@ -16,7 +16,7 @@ class Arrow extends Rectangle implements Constants {
 	double velx = 0,
 		   vely = 0;
 
-	double gravy = 0.2;
+	double gravy = 0;
 
 	int direction;
 
