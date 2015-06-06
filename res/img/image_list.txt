@@ -1,0 +1,9 @@
+A-D.png
+A-L.png
+A-R.png
+A-U.png
+SpeedA-D.png
+SpeedA-L.png
+SpeedA-R.png
+SpeedA-U.png
+SpeedP.png

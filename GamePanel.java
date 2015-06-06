@@ -59,7 +59,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		setFocusable(true);
 	}
 
-	public void reset(String mapname) {
+	public void resetMap(String mapname) {
 		arrows.clear();
 		map = maps.get(mapname);
 
