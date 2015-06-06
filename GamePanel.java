@@ -262,24 +262,25 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		player2.tick();
 
 		// Player 1 Movement
-		if (keys[KeyEvent.VK_RIGHT] == keys[KeyEvent.VK_LEFT]) {
+		if (keys[VK_RIGHT] == keys[VK_LEFT] ||
+		    keys[VK_]) {
 			// XNOR: both or neither are pressed
 			player1.drag();
-		} else if (keys[KeyEvent.VK_RIGHT]) {
+		} else if (keys[VK_RIGHT]) {
 			player1.accelerate(RIGHT);
-		} else if (keys[KeyEvent.VK_LEFT]) {
+		} else if (keys[VK_LEFT]) {
 			player1.accelerate(LEFT);
 		}
 
 		player1.move(map);
 		player1.fall();
 
-		if (keys[KeyEvent.VK_L] == keys[KeyEvent.VK_J]) {
+		if (keys[VK_L] == keys[VK_J]) {
 			// XNOR: both or neither are pressed
 			player2.drag();
-		} else if (keys[KeyEvent.VK_L]) {
+		} else if (keys[VK_L]) {
 			player2.accelerate(RIGHT);
-		} else if (keys[KeyEvent.VK_J]) {
+		} else if (keys[VK_J]) {
 			player2.accelerate(LEFT);
 		}
 
