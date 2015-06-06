@@ -33,6 +33,7 @@ class Player extends Rectangle implements Constants {
 
 	// Arrows
 	int arrows = 8;
+	int arrowspeed = 16;
 
 	// Last input
 	int last_input = -1;

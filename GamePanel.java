@@ -37,7 +37,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	// Arrows
 	ArrayList<Arrow> arrows = new ArrayList<>();
-	int arrowspeed = 16;
 
 	// Game State
 	int state = GAME;
@@ -50,7 +49,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			keys[i] = false;
 
 		loadMaps();
-		map = maps.get("Forest");
+		map = maps.get("Island");
 
 		// Event listeners
 		addMouseListener(this);
@@ -185,17 +184,20 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					break;
 
 				case VK_C:
-					if (keys[VK_DOWN] & !keys[VK_UP]) {
-						a = new Arrow(player1.x, player1.y, Arrow.DOWN, arrowspeed);
+					if (keys[VK_DOWN] && !keys[VK_UP]) {
+						a = new Arrow(player1.x, player1.y, Arrow.DOWN, player1.arrowspeed);
 					} else
-					if (keys[VK_UP] & !keys[VK_DOWN]) {
-						a = new Arrow(player1.x, player1.y, Arrow.UP, arrowspeed);
+					if (keys[VK_UP] && !keys[VK_DOWN]) {
+						a = new Arrow(player1.x, player1.y, Arrow.UP, player1.arrowspeed);
 					} else
-					if (keys[VK_LEFT] & !keys[VK_RIGHT]) {
-						a = new Arrow(player1.x, player1.y, Arrow.LEFT, arrowspeed);
+					if (keys[VK_LEFT] && !keys[VK_RIGHT]) {
+						a = new Arrow(player1.x, player1.y, Arrow.LEFT, player1.arrowspeed);
 					} else
-					if (keys[VK_RIGHT] & !keys[VK_LEFT]) {
-						a = new Arrow(player1.x, player1.y, Arrow.RIGHT, arrowspeed);
+					if (keys[VK_RIGHT] && !keys[VK_LEFT]) {
+						a = new Arrow(player1.x, player1.y, Arrow.RIGHT, player1.arrowspeed);
+					} else
+					if (!(keys[VK_RIGHT] || keys[VK_LEFT] || keys[VK_DOWN] || keys[VK_UP])) {
+						a = new Arrow(player1.x, player1.y, player1.last_input, player1.arrowspeed);
 					}
 
 					if (a != null) {
@@ -204,17 +206,20 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					break;
 
 				case VK_D:
-					if (keys[VK_K] & !keys[VK_I]) {
-						a = new Arrow(player2.x, player2.y, Arrow.DOWN, arrowspeed);
+					if (keys[VK_K] && !keys[VK_I]) {
+						a = new Arrow(player2.x, player2.y, Arrow.DOWN, player2.arrowspeed);
 					} else
-					if (keys[VK_I] & !keys[VK_K]) {
-						a = new Arrow(player2.x, player2.y, Arrow.UP, arrowspeed);
+					if (keys[VK_I] && !keys[VK_K]) {
+						a = new Arrow(player2.x, player2.y, Arrow.UP, player2.arrowspeed);
 					} else
-					if (keys[VK_J] & !keys[VK_L]) {
-						a = new Arrow(player2.x, player2.y, Arrow.LEFT, arrowspeed);
+					if (keys[VK_J] && !keys[VK_L]) {
+						a = new Arrow(player2.x, player2.y, Arrow.LEFT, player2.arrowspeed);
 					} else
-					if (keys[VK_L] & !keys[VK_J]) {
-						a = new Arrow(player2.x, player2.y, Arrow.RIGHT, arrowspeed);
+					if (keys[VK_L] && !keys[VK_J]) {
+						a = new Arrow(player2.x, player2.y, Arrow.RIGHT, player2.arrowspeed);
+					} else
+					if (!(keys[VK_RIGHT] || keys[VK_LEFT] || keys[VK_DOWN] || keys[VK_UP])) {
+						a = new Arrow(player2.x, player2.y, player2.last_input, player2.arrowspeed);
 					}
 					
 					if (a != null) {

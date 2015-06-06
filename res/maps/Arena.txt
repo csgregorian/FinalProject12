@@ -1,0 +1,20 @@
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+O        OO        OO        OO        O
+O        OO        OO        OO        O
+O            O  O                O  O  O
+O   OO                  OO             O
+O   OO                  OO             O
+O            O  O                O  O  O
+O        OO        OO        OO        O
+O        OO        OO        OO        O
+OOO    OOOOOO    OOOOOO    OOOOOO    OOO
+OOO    OOOOOO    OOOOOO    OOOOOO    OOO
+O        OO        OO        OO        O
+O        OO        OO        OO        O
+O  O  O                O  O            O
+O             OO                  OO   O
+O             OO                  OO   O
+O  O  O                O  O            O
+O        OO        OO        OO        O
+O        OO        OO        OO        O
+OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
