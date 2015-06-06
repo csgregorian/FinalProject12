@@ -8,7 +8,7 @@ import javax.imageio.*;
 import java.util.HashMap;
 
 class Powerup extends Rectangle implements Constants {
-	int type = 0;
+	int type;
 
 	public Powerup(int x, int y, int type) {
 		this.x = x;

@@ -22,7 +22,7 @@ public class main extends JFrame implements ActionListener, Constants {
 	Timer myTimer = new Timer(16, this);
 
 	int sizex = 1280;
-	int sizey = 640;
+	int sizey = 740;
 
 	GamePanel game = new GamePanel(sizex, sizey);
 
@@ -48,16 +48,6 @@ public class main extends JFrame implements ActionListener, Constants {
 					game.playerCalc();
 					game.arrowCalc();
 					break;
-
-				case MENU:
-					break;
-
-				case SCORE:
-					break;
-
-				case CREDITS:
-					break;
-				
 			}
 
 

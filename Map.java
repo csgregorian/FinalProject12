@@ -15,7 +15,7 @@ class Map implements Constants {
 
 
 	ArrayList<Block> blocks;
-	ArrayList<Powerup> powerups;
+	ArrayList<Block> powerup_spawns;
 	String name;
 
 	public Map(String name) {

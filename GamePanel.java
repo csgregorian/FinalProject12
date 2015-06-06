@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.awt.image.*;
+import java.awt.geom.*;
 import java.io.*;
 import javax.imageio.*;
 
@@ -24,7 +25,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	boolean keys[] = new boolean[256];
 
 	// Texture manager
-	TextureManager textures = new TextureManager();
+	TextureManager tex = new TextureManager();
 
 	// Players
 	Player player1 = new Player(7*32, 5*32),
@@ -48,8 +49,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		for (int i = 0; i < 256; i++)
 			keys[i] = false;
 
+		loadImages();
+
 		loadMaps();
-		map = maps.get("Island");
+		map = maps.get("Hell");
 
 		// Event listeners
 		addMouseListener(this);
@@ -65,7 +68,26 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 		Player player1 = new Player(7*32, 5*32),
 			   player2 = new Player(34*32, 5*32);
+	}
 
+	public void loadImages() {
+		Scanner image_list;
+
+		try {
+			image_list = new Scanner(new File("res/img/image_list.txt"));
+
+			while (image_list.hasNext()) {
+				String img_name = image_list.next();
+				String file_name = String.format("res/img/%s.png", img_name);
+				tex.addTexture(img_name, file_name);
+			}
+		} catch (FileNotFoundException e) {
+			System.err.println("res/img/images_list.txt not found");
+			System.exit(0);
+		} catch (Exception e) {
+			System.err.println(e);
+			System.exit(0);
+		}
 	}
 
 	public void loadMaps() {
@@ -91,9 +113,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 		// Create the new map objects
 		for (String map_name : map_names) {
-			String filename = String.format("res/maps/%s.png", map_name);
-			System.out.println(filename);
-			textures.addTexture(map_name, filename);
+			String file_name = String.format("res/maps/%s.png", map_name);
+			System.out.println(file_name);
+			tex.addTexture(map_name, file_name);
 
 			Map map = new Map(map_name);
 			maps.put(map_name, map);
@@ -231,7 +253,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					break;
 			}
 		} else
-		if (state == MENU) {
+		if (state == PLAYERMENU) {
 			switch (code) {
 				case VK_DOWN:
 
@@ -250,11 +272,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		keys[e.getKeyCode()] = false;
 	}
 
-	public void paintComponent(Graphics g) {
-		paintBackground(g);
-		paintPlayers(g);
-		paintArrows(g);
-	}
 
 	public void playerCalc() {
 		// Time
@@ -263,7 +280,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 		// Player 1 Movement
 		if (keys[VK_RIGHT] == keys[VK_LEFT] ||
-		    keys[VK_]) {
+		    keys[VK_Z]) {
 			// XNOR: both or neither are pressed
 			player1.drag();
 		} else if (keys[VK_RIGHT]) {
@@ -275,7 +292,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		player1.move(map);
 		player1.fall();
 
-		if (keys[VK_L] == keys[VK_J]) {
+		if (keys[VK_L] == keys[VK_J] ||
+		    keys[VK_A]) {
 			// XNOR: both or neither are pressed
 			player2.drag();
 		} else if (keys[VK_L]) {
@@ -309,10 +327,18 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		arrows.removeIf(a -> !a.alive);
 	}
 
+	public void paintComponent(Graphics g) {
+		paintBackground(g);
+		paintPlayers(g);
+		paintArrows(g);
+		paintOverlay(g);
+	}
+
 	public void paintBackground(Graphics g) {
 		g.setColor(Color.white);
 		g.fillRect(0, 0, sizex, sizey);
-		g.drawImage(textures.getTexture(map.name), 0, 0, this);
+		AffineTransform at = new AffineTransform();
+		g.drawImage(tex.getTexture(map.name), 0, 0, this);
 
 		g.setColor(Color.black);
 		// for (Block b : map.blocks) {
@@ -336,10 +362,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		g.fillRect(player2.x-1280, player2.y, 32, 32);
 		g.fillRect(player2.x, player2.y-640, 32, 32);
 		g.fillRect(player2.x, player2.y+640, 32, 32);
-
-		g.setColor(Color.red);
-		g.fillRect(player1.x, player1.y, player1.hp*8, 4);
-		g.fillRect(player2.x, player2.y, player2.hp*8, 4);
 	}
 
 	public void paintArrows(Graphics g) {
@@ -347,6 +369,19 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		for (Arrow a : arrows) {
 			fillRect(g, a);
 		}
+	}
+
+	public void paintOverlay(Graphics g) {
+		g.drawImage(tex.getTexture("Scorebar"), 0, 640, this);
+
+		g.setColor(new Color(200, 200, 200));
+		g.setFont(new Font("Droid Sans", Font.PLAIN, 32));
+		g.drawString("Player 1", 32, 690);
+		g.drawString("Player 2", 1100, 690);
+
+		g.setColor(Color.red);
+		g.fillRect(32, 692, 32*player1.hp, 4);
+		g.fillRect(1100, 692, 32*player2.hp, 4);
 	}
 
 	public void fillRect(Graphics g, Rectangle rect) {
