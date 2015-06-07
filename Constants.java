@@ -11,5 +11,5 @@ public interface Constants {
 	final static int NONE = 0, SPEED = 1, JUMP = 2, BULLET = 3;
 
     // Game states
-	final static int GAME = 0, INTRO = 1, PLAYERMENU = 2, STAGEMENU = 3, PAUSE = 4, SCORE = 5;
+	final static int GAME = 0, INTRO = 1, PLAYERMENU = 2, MAPMENU = 3, PAUSE = 4, SCORE = 5;
 }

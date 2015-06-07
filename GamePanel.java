@@ -35,12 +35,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	HashMap<String, Map> maps = new HashMap<>();
 	ArrayList<String> map_names = new ArrayList<>();
 	Map map;
+	int map_cursor = 0;
 
 	// Arrows
 	ArrayList<Arrow> arrows = new ArrayList<>();
 
 	// Game State
-	int state = GAME;
+	int state = MAPMENU;
 
 
 	public GamePanel(int x, int y) {
@@ -52,7 +53,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		loadImages();
 
 		loadMaps();
-		map = maps.get("Hell");
+		map = maps.get("Forest");
 
 		// Event listeners
 		addMouseListener(this);
@@ -253,15 +254,24 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					break;
 			}
 		} else
-		if (state == PLAYERMENU) {
+		if (state == MAPMENU) {
 			switch (code) {
 				case VK_DOWN:
-
 				case VK_UP:
-
+					map_cursor = (map_cursor + 2) % 4;
+					break;
 				case VK_RIGHT:
-
+					map_cursor = (map_cursor + 1) % 4;
+					break;
 				case VK_LEFT:
+					map_cursor = (map_cursor + 3) % 4;
+					break;
+				case VK_ENTER:
+					state = GAME;
+					resetMap(map_names.get(map_cursor));
+					break;
+				default:
+					break;
 
 			}
 		}
@@ -328,13 +338,20 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	}
 
 	public void paintComponent(Graphics g) {
-		paintBackground(g);
-		paintPlayers(g);
-		paintArrows(g);
-		paintOverlay(g);
+		switch (state) {
+			case GAME:
+				paintGameBackground(g);
+				paintGamePlayers(g);
+				paintGameArrows(g);
+				paintGameOverlay(g);
+				break;
+			case MAPMENU:
+				paintMapMenu(g);
+				paintMapOverlay(g);
+		}
 	}
 
-	public void paintBackground(Graphics g) {
+	public void paintGameBackground(Graphics g) {
 		g.setColor(Color.white);
 		g.fillRect(0, 0, sizex, sizey);
 		AffineTransform at = new AffineTransform();
@@ -347,7 +364,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	}
 
-	public void paintPlayers(Graphics g) {
+	public void paintGamePlayers(Graphics g) {
 		g.setColor(Color.green);
 		fillRect(g, player1);
 		g.fillRect(player1.x+1280, player1.y, 32, 32);
@@ -364,15 +381,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		g.fillRect(player2.x, player2.y+640, 32, 32);
 	}
 
-	public void paintArrows(Graphics g) {
+	public void paintGameArrows(Graphics g) {
 		g.setColor(Color.green);
 		for (Arrow a : arrows) {
 			fillRect(g, a);
 		}
 	}
 
-	public void paintOverlay(Graphics g) {
-		g.drawImage(tex.getTexture("Scorebar"), 0, 640, this);
+	public void paintGameOverlay(Graphics g) {
+		g.drawImage(tex.getTexture("Overlay"), 0, 640, this);
 
 		g.setColor(new Color(200, 200, 200));
 		g.setFont(new Font("Droid Sans", Font.PLAIN, 32));
@@ -382,6 +399,24 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		g.setColor(Color.red);
 		g.fillRect(32, 692, 32*player1.hp, 4);
 		g.fillRect(1100, 692, 32*player2.hp, 4);
+	}
+
+	public void paintMapMenu(Graphics g) {
+		g.drawImage(tex.getTexture("Background"), 0, 0, this);
+
+		g.setColor(Color.white);
+		g.fillRect(156 + (map_cursor % 2) * 640,
+				   76 + (map_cursor / 2) * 320, 328, 168);
+
+		g.setColor(Color.red);
+		for (int i = 0; i < map_names.size(); i++) {
+			g.fillRect(160 + ((i % 2) * 640),
+					   80 + ((i / 2) * 320), 320, 160);
+		}
+	}
+
+	public void paintMapOverlay(Graphics g) {
+		g.drawImage(tex.getTexture("Overlay"), 0, 640, this);
 	}
 
 	public void fillRect(Graphics g, Rectangle rect) {
