@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-class Arrow extends Rectangle implements Constants {
+public class Arrow extends Rectangle implements Constants {
 	// Constants
 	final static int RIGHT = 0, LEFT = 1, DOWN = 2, UP = 3;
 

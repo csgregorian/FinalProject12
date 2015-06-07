@@ -7,7 +7,9 @@ import javax.imageio.*;
 
 import java.util.HashMap;
 
-class Player extends Rectangle implements Constants {
+public class Player extends Rectangle implements Constants {
+	String name;
+
 	// Velocity
 	double velx = 0,
 		   vely = 0,
@@ -50,7 +52,9 @@ class Player extends Rectangle implements Constants {
 	final static int RIGHT = 0, LEFT = 1, DOWN = 2, UP = 3;
 	final static int NONE = 0, SPEED = 1, JUMP = 2, BULLET = 3;
 
-	public Player(int startx, int starty) {
+	public Player(String name, int startx, int starty) {
+		this.name = name;
+
 		x = startx;
 		y = starty;
 
@@ -318,5 +322,22 @@ class Player extends Rectangle implements Constants {
 
 	public Rectangle rectBottom() {
 		return new Rectangle(x, y + 32, 32, 1);
+	}
+
+	public BufferedImage getSprite(TextureManager tex) {
+		String template = "%s-%s-%d";
+		switch (last_input) {
+			case RIGHT:
+				System.out.println(String.format(template, name, "R", (x % 1000) / 500));
+				return tex.getTexture(String.format(template, name, "R", (x % 100) / 50));
+			case LEFT:
+				return tex.getTexture(String.format(template, name, "L", (x % 100) / 50));
+			case DOWN:
+				return tex.getTexture(String.format(template, name, "D", (x % 100) / 50));
+			case UP:
+				return tex.getTexture(String.format(template, name, "U", (x % 100) / 50));
+			default:
+				return tex.getTexture(String.format(template, name, "R", (x % 100) / 50));
+		}
 	}
 }

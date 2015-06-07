@@ -7,7 +7,7 @@ import javax.imageio.*;
 
 import java.util.HashMap;
 
-class Block extends Rectangle implements Constants {
+public class Block extends Rectangle implements Constants {
 
 	public Block(int x, int y) {
 		this.x = x;

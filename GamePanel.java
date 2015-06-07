@@ -28,8 +28,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	TextureManager tex = new TextureManager();
 
 	// Players
-	Player player1 = new Player(7*32, 5*32),
-		   player2 = new Player(34*32, 5*32);
+	ArrayList<String> players = new ArrayList<String>();
+	Player player1 = new Player("Link", 7*32, 5*32),
+		   player2 = new Player("BlackLink", 34*32, 5*32);
+
+	int player1_cursor = 0;
+	int player2_cursor = 1;
 
 	// Maps
 	HashMap<String, Map> maps = new HashMap<>();
@@ -41,7 +45,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	ArrayList<Arrow> arrows = new ArrayList<>();
 
 	// Game State
-	int state = MAPMENU;
+	int state = PLAYERMENU;
 
 
 	public GamePanel(int x, int y) {
@@ -55,6 +59,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		loadMaps();
 		map = maps.get("Forest");
 
+		loadPlayers();
+
 		// Event listeners
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -67,8 +73,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		arrows.clear();
 		map = maps.get(mapname);
 
-		Player player1 = new Player(7*32, 5*32),
-			   player2 = new Player(34*32, 5*32);
+		
+	}
+
+	public void resetPlayers(String name1, String name2) {
+		Player player1 = new Player(name1, 7*32, 5*32),
+			   player2 = new Player(name2, 34*32, 5*32);
 	}
 
 	public void loadImages() {
@@ -121,7 +131,24 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			Map map = new Map(map_name);
 			maps.put(map_name, map);
 		}
-		
+	}
+
+	public void loadPlayers() {
+		Scanner player_list;
+
+		try {
+			player_list = new Scanner(new File("res/img/player_list.txt"));
+
+			while (player_list.hasNext()) {
+				players.add(player_list.next());
+			}
+		} catch (FileNotFoundException e) {
+			System.err.println("res/img/images_list.txt not found");
+			System.exit(0);
+		} catch (Exception e) {
+			System.err.println(e);
+			System.exit(0);
+		}
 	}
 
 	// Placeholder function overrides for event listeners
@@ -254,16 +281,59 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					break;
 			}
 		} else
+		if (state == PLAYERMENU) {
+			switch (code) {
+				case VK_RIGHT:
+					player1_cursor++;
+					if (player1_cursor == player2_cursor) {
+						player1_cursor++;
+					}
+					player1_cursor = player1_cursor % players.size();
+					break;
+				case VK_LEFT:
+					player1_cursor--;
+					if (player1_cursor == player2_cursor) {
+						player1_cursor--;
+					}
+					player1_cursor = (player1_cursor + players.size()) % players.size();
+					break;
+				case VK_L:
+					player2_cursor++;
+					player2_cursor = player2_cursor % players.size();
+					if (player2_cursor == player1_cursor) {
+						player2_cursor++;
+					}
+					player2_cursor = player2_cursor % players.size();
+					break;
+				case VK_J:
+					player2_cursor--;
+					if (player2_cursor == player1_cursor) {
+						player2_cursor--;
+					}
+					player2_cursor = (player2_cursor + players.size()) % players.size();
+					break;
+				case VK_ENTER:
+					state = MAPMENU;
+					resetPlayers(players.get(player1_cursor), players.get(player2_cursor));
+					break;
+				default:
+					break;
+			}
+		} else
 		if (state == MAPMENU) {
 			switch (code) {
 				case VK_DOWN:
 				case VK_UP:
+				case VK_K:
+				case VK_I:
 					map_cursor = (map_cursor + 2) % 4;
 					break;
 				case VK_RIGHT:
+				case VK_L:
 					map_cursor = (map_cursor + 1) % 4;
 					break;
 				case VK_LEFT:
+				case VK_J:
 					map_cursor = (map_cursor + 3) % 4;
 					break;
 				case VK_ENTER:
@@ -345,9 +415,16 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				paintGameArrows(g);
 				paintGameOverlay(g);
 				break;
+
+			case PLAYERMENU:
+				paintPlayerMenu(g);
+				paintPlayerOverlay(g);
+				break;
+
 			case MAPMENU:
 				paintMapMenu(g);
 				paintMapOverlay(g);
+				break;
 		}
 	}
 
@@ -365,20 +442,17 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	}
 
 	public void paintGamePlayers(Graphics g) {
-		g.setColor(Color.green);
-		fillRect(g, player1);
-		g.fillRect(player1.x+1280, player1.y, 32, 32);
-		g.fillRect(player1.x-1280, player1.y, 32, 32);
-		g.fillRect(player1.x, player1.y-640, 32, 32);
-		g.fillRect(player1.x, player1.y+640, 32, 32);
+		g.drawImage(player1.getSprite(tex), player1.x, player1.y, this);
+		g.drawImage(player1.getSprite(tex), player1.x-1280, player1.y, this);
+		g.drawImage(player1.getSprite(tex), player1.x+1280, player1.y, this);
+		g.drawImage(player1.getSprite(tex), player1.x, player1.y-640, this);
+		g.drawImage(player1.getSprite(tex), player1.x, player1.y+640, this);
 
-
-		g.setColor(Color.blue);
-		fillRect(g, player2);
-		g.fillRect(player2.x+1280, player2.y, 32, 32);
-		g.fillRect(player2.x-1280, player2.y, 32, 32);
-		g.fillRect(player2.x, player2.y-640, 32, 32);
-		g.fillRect(player2.x, player2.y+640, 32, 32);
+		g.drawImage(player2.getSprite(tex), player2.x, player2.y, this);
+		g.drawImage(player2.getSprite(tex), player2.x-1280, player2.y, this);
+		g.drawImage(player2.getSprite(tex), player2.x+1280, player2.y, this);
+		g.drawImage(player2.getSprite(tex), player2.x, player2.y-640, this);
+		g.drawImage(player2.getSprite(tex), player2.x, player2.y+640, this);
 	}
 
 	public void paintGameArrows(Graphics g) {
@@ -420,6 +494,20 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	}
 
 	public void paintMapOverlay(Graphics g) {
+		g.drawImage(tex.getTexture("Overlay"), 0, 640, this);
+	}
+
+	public void paintPlayerMenu(Graphics g) {
+		g.drawImage(tex.getTexture("Background"), 0, 0, this);
+
+		String p1 = String.format("%s-D-0", players.get(player1_cursor));
+		String p2 = String.format("%s-D-0", players.get(player2_cursor));
+
+		g.drawImage(tex.getTexture(p1), 160, 160, 320, 320, this);
+		g.drawImage(tex.getTexture(p2), 700, 160, 320, 320, this);
+	}
+
+	public void paintPlayerOverlay(Graphics g) {
 		g.drawImage(tex.getTexture("Overlay"), 0, 640, this);
 	}
 

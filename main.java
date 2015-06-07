@@ -49,6 +49,9 @@ public class main extends JFrame implements ActionListener, Constants {
 					game.arrowCalc();
 					break;
 
+				case PLAYERMENU:
+					break;
+
 				case MAPMENU:
 					break;
 			}

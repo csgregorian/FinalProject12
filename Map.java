@@ -8,7 +8,7 @@ import javax.imageio.*;
 import java.util.HashMap;
 import java.util.ArrayList;
 
-class Map implements Constants {
+public class Map implements Constants {
 	// Constants
 	final static int RIGHT = 0, LEFT = 1, DOWN = 2, UP = 3;
 	final static int NONE = 0, SPEED = 1, JUMP = 2, BULLET = 3;

@@ -1,4 +1,4 @@
-public interface Constants {
+public interface Globals {
 	/* Shared global interface between all classes */
 
 	// Tiles
