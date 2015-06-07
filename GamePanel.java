@@ -410,8 +410,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 		g.setColor(Color.red);
 		for (int i = 0; i < map_names.size(); i++) {
-			g.fillRect(160 + ((i % 2) * 640),
-					   80 + ((i / 2) * 320), 320, 160);
+			g.drawImage(tex.getTexture(map_names.get(i)),
+					   160 + ((i % 2) * 640),
+					   80 + ((i / 2) * 320),
+					   320,
+					   160,
+					   this);
 		}
 	}
 
