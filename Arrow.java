@@ -161,4 +161,26 @@ public class Arrow extends Rectangle implements Constants {
 			y -= 640;
 		}
 	}
+
+	public BufferedImage getSprite(TextureManager tex) {
+		String template = "%s-%s";
+		String name;
+		if (Math.abs(Math.max(velx, vely)) == 32) {
+			name = "SpeedA";
+		} else {
+			name = "A";
+		}
+		switch (direction) {
+			case RIGHT:
+				return tex.getTexture(String.format(template, name, "R"));
+			case LEFT:
+				return tex.getTexture(String.format(template, name, "L"));
+			case DOWN:
+				return tex.getTexture(String.format(template, name, "D"));
+			case UP:
+				return tex.getTexture(String.format(template, name, "U"));
+			default:
+				return null;
+		}
+	}
 }

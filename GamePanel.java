@@ -458,7 +458,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public void paintGameArrows(Graphics g) {
 		g.setColor(Color.green);
 		for (Arrow a : arrows) {
-			fillRect(g, a);
+			g.drawImage(a.getSprite(tex), a.x, a.y, this);
 		}
 	}
 
