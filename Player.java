@@ -7,14 +7,14 @@ import javax.imageio.*;
 
 import java.util.HashMap;
 
-public class Player extends Rectangle implements Constants {
+public class Player extends Rectangle implements  Globals {
 	String name;
 
 	// Velocity
 	double velx = 0,
 		   vely = 0,
 		   maxvelx = 6,
-		   maxvely = 5,
+		   maxvely = 50,
 	       startvelx = 3,
 	       startvely = 1;
 
@@ -48,7 +48,7 @@ public class Player extends Rectangle implements Constants {
 	int powerup = 0;
 	int powerup_timer = 0;
 
-	// Constants
+	//  Globals
 	final static int RIGHT = 0, LEFT = 1, DOWN = 2, UP = 3;
 	final static int NONE = 0, SPEED = 1, JUMP = 2, BULLET = 3;
 
@@ -131,6 +131,9 @@ public class Player extends Rectangle implements Constants {
 
 	public void fall() {
 		vely += gravy;
+		if (vely > maxvely) {
+			vely = maxvely;
+		}
 	}
 
 	public void move(Map map) {

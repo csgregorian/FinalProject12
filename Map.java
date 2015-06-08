@@ -8,14 +8,14 @@ import javax.imageio.*;
 import java.util.HashMap;
 import java.util.ArrayList;
 
-public class Map implements Constants {
-	// Constants
+public class Map implements  Globals {
+	//  Globals
 	final static int RIGHT = 0, LEFT = 1, DOWN = 2, UP = 3;
 	final static int NONE = 0, SPEED = 1, JUMP = 2, BULLET = 3;
 
 
-	ArrayList<Block> blocks;
-	ArrayList<Block> powerup_spawns;
+	ArrayList<Block> blocks = new ArrayList<>();
+	ArrayList<Block> powerups = new ArrayList<>();
 	String name;
 
 	public Map(String name) {
@@ -37,6 +37,9 @@ public class Map implements Constants {
 					}
 					if (c == 'O') {
 						blocks.add(new Block(x * TILESIZE, y * TILESIZE));
+					} else
+					if (c == '_') {
+						powerups.add(new Block(x * TILESIZE, y * TILESIZE));
 					}
 				}
 			}

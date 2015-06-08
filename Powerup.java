@@ -7,7 +7,7 @@ import javax.imageio.*;
 
 import java.util.HashMap;
 
-public class Powerup extends Rectangle implements Constants {
+public class Powerup extends Rectangle implements  Globals {
 	int type;
 
 	public Powerup(int x, int y, int type) {
@@ -17,5 +17,9 @@ public class Powerup extends Rectangle implements Constants {
 		this.type = type;
 
 		width = height = 32;
+	}
+
+	public BufferedImage getSprite(TextureManager tex) {
+		return tex.getTexture("Powerup-" + Integer.toString(type));
 	}
 }

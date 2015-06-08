@@ -17,9 +17,8 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 
-public class main extends JFrame implements ActionListener, Constants {
-	int fps = 60;
-	Timer myTimer = new Timer(16, this);
+public class main extends JFrame implements ActionListener, Globals {
+	Timer myTimer = new Timer(1000 / FPS, this);
 
 	int sizex = 1280;
 	int sizey = 740;
@@ -45,8 +44,7 @@ public class main extends JFrame implements ActionListener, Constants {
 		if (game != null) {
 			switch (game.state) {
 				case GAME:
-					game.playerCalc();
-					game.arrowCalc();
+					game.gameTick();
 					break;
 
 				case PLAYERMENU:
