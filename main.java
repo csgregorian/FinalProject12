@@ -43,6 +43,9 @@ public class main extends JFrame implements ActionListener, Globals {
 	public void actionPerformed(ActionEvent evt) {
 		if (game != null) {
 			switch (game.state) {
+				case INTRO:
+					break;
+					
 				case GAME:
 					game.gameTick();
 					break;
@@ -51,6 +54,9 @@ public class main extends JFrame implements ActionListener, Globals {
 					break;
 
 				case MAPMENU:
+					break;
+
+				case PAUSE:
 					break;
 			}
 

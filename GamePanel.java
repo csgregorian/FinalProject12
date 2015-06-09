@@ -49,7 +49,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 
     // Game State
-    int state = PLAYERMENU;
+    int state = INTRO;
     int time = 0;
 
 
@@ -202,7 +202,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
             switch (code) {
                 case VK_ESCAPE:
-                    System.exit(0);
+                    state = PAUSE;
                     break;
 
                 case VK_X:
@@ -321,6 +321,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                     state = MAPMENU;
                     resetPlayers(players.get(player1_cursor), players.get(player2_cursor));
                     break;
+                case VK_ESCAPE:
+                    // state = INTRO;
+                    break;
                 default:
                     break;
             }
@@ -345,12 +348,36 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                     state = GAME;
                     resetMap(map_names.get(map_cursor));
                     break;
+                case VK_ESCAPE:
+                    state = PLAYERMENU;
+                    break;
                 default:
                     break;
 
             }
+        } else
+        if (state == PAUSE) {
+            switch (code) {
+                case VK_ENTER:
+                    state = INTRO;
+                    break;
+                case VK_ESCAPE:
+                    state = GAME;
+                    break;
+                default:
+                    break;
+            }
+        } else
+        if (state == INTRO) {
+            switch (code) {
+                case VK_ESCAPE:
+                    System.exit(0);
+                    break;
+                case VK_ENTER:
+                    state = PLAYERMENU;
+                    break;
+            }
         }
-
     }
 
     public void gameTick() {
@@ -430,11 +457,22 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     public void paintComponent(Graphics g) {
         switch (state) {
+            case INTRO:
+                paintIntroBackground(g);
+                break;
             case GAME:
                 paintGameBackground(g);
                 paintGamePlayers(g);
                 paintGameArrows(g);
                 paintGameOverlay(g);
+                break;
+
+            case PAUSE:
+                paintGameBackground(g);
+                paintGamePlayers(g);
+                paintGameArrows(g);
+                paintGameOverlay(g);
+                paintPauseMenu(g);
                 break;
 
             case PLAYERMENU:
@@ -449,10 +487,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         }
     }
 
+    public void paintIntroBackground(Graphics g) {
+        g.drawImage(tex.getTexture("Background"), 0, 0, this);
+    }
+
     public void paintGameBackground(Graphics g) {
         g.setColor(Color.white);
         g.fillRect(0, 0, sizex, sizey);
-        AffineTransform at = new AffineTransform();
         g.drawImage(tex.getTexture(map.name), 0, 0, this);
 
         g.setColor(Color.black);
@@ -530,6 +571,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     public void paintPlayerOverlay(Graphics g) {
         g.drawImage(tex.getTexture("Overlay"), 0, 640, this);
+    }
+
+    public void paintPauseMenu(Graphics g) {
+        g.setColor(new Color(0, 0, 0, 100));
+        g.fillRect(0, 0, 1280, 640);
     }
 
     public void fillRect(Graphics g, Rectangle rect) {
