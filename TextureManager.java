@@ -20,7 +20,7 @@ public class TextureManager implements Globals {
 			image = ImageIO.read(new File(filename));
 			textures.put(name, image);
 		} catch (Exception e) {
-			System.err.print("ADDTEXTURE BROKE");
+			System.err.print("Texture not found");
 			System.exit(0);
 		}
 	}

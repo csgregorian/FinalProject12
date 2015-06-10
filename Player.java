@@ -291,24 +291,21 @@ public class Player extends Rectangle implements Globals {
 	}
 
 	public void getPowerup(int type) {
-		powerup_timer = 600;
+		removePowerup();
 
-		if (powerup != NONE) {
-			removePowerup();
-		}
-
-		powerup = type;
-		switch (powerup) {
+		switch (type) {
 			case NONE:
 				break;
 
 			case SPEED:
+				accelx *= 2;
 				maxvelx *= 2;
 				break;
 
 			case JUMP:
 				jumpy *= 2;
 				gravy *= 2;
+				break;
 
 			case BULLET:
 				arrowspeed *= 2;
@@ -324,6 +321,9 @@ public class Player extends Rectangle implements Globals {
 				break;
 
 		}
+
+		powerup_timer = 600;
+		powerup = type;
 	}
 
 	public void removePowerup() {
@@ -332,11 +332,14 @@ public class Player extends Rectangle implements Globals {
 				break;
 
 			case SPEED:
+				accelx /= 2;
 				maxvelx /= 2;
+				break;
 
 			case JUMP:
 				jumpy /= 2;
 				gravy /= 2;
+				break;
 
 			case BULLET:
 				arrowspeed /= 2;
@@ -352,16 +355,19 @@ public class Player extends Rectangle implements Globals {
 				break;
 		}
 
+		powerup_timer = 0;
 		powerup = NONE;
 	}
 
 	public void checkPowerup() {
-		System.out.println(powerup);
-		powerup_timer--;
-
-		if (powerup_timer == 0) {
-			removePowerup();
+		if (powerup != NONE) {
+			powerup_timer--;
+			if (powerup_timer <= 0) {
+				removePowerup();
+			}
 		}
+
+		
 	}
 
 	public Rectangle rectRight() {

@@ -1,6 +1,8 @@
 /* Final Project
  * Grade 12
  * Christopher Gregorian
+ * main.java
+ * Creates a JFrame which handles action handling
  */
 
 import java.awt.*;
@@ -68,8 +70,6 @@ public class main extends JFrame implements ActionListener, Globals {
 	}
 
 	public static void main(String[] args) {
-		Rectangle r1 = new Rectangle(10, 10, 10, 10);
-		Rectangle r2 = new Rectangle(0, 0, 10, 10);
 		main frame = new main();
 	}
 }

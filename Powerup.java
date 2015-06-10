@@ -10,6 +10,7 @@ import java.util.HashMap;
 public class Powerup extends Rectangle implements Globals {
 	int type;
 
+	int timer = 600;
 	boolean alive = true;
 
 	public Powerup(int startx, int starty, int type) {
@@ -19,6 +20,13 @@ public class Powerup extends Rectangle implements Globals {
 		this.type = type;
 
 		width = height = 32;
+	}
+
+	public tick() {
+		timer--;
+		if (timer <= 0) {
+			alive = false;
+		}
 	}
 
 	public BufferedImage getSprite(TextureManager tex) {

@@ -1,3 +1,7 @@
+/* GamePanel.java
+ * 
+ */
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -12,14 +16,9 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener, Globals {
+public class GamePanel extends JPanel implements KeyListener, Globals {
     // Window size
     int sizex, sizey;
-
-    // Mouse location
-    int mx = 0,
-        my = 0;
-    boolean click = false;
 
     // Keys pressed
     boolean keys[] = new boolean[256];
@@ -41,10 +40,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     Map map;
     int map_cursor = 0;
 
-    // Arrows
+    // Entities
     ArrayList<Arrow> arrows = new ArrayList<>();
-
-    // Powerups
     ArrayList<Powerup> powerups = new ArrayList<>();
 
 
@@ -67,8 +64,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         loadPlayers();
 
         // Event listeners
-        addMouseListener(this);
-        addMouseMotionListener(this);
         addKeyListener(this);
 
         setFocusable(true);
@@ -156,38 +151,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         }
     }
 
-    // Placeholder function overrides for event listeners
-    public void mouseClicked(MouseEvent e) {
-        
-    }
-
-    public void mousePressed(MouseEvent e) {
-        click = true;
-        mx = e.getX();
-        my = e.getY();
-    }
-
-    public void mouseReleased(MouseEvent e) {
-        click = false;
-    }
-
-    public void mouseEntered(MouseEvent e) {
-        
-    }
-
-    public void mouseExited(MouseEvent e) {
-        
-    }
-
-    public void mouseDragged(MouseEvent e) {
-        mx = e.getX();
-        my = e.getY();
-    }
-
-    public void mouseMoved(MouseEvent e) {
-
-    }
-
     public void keyTyped(KeyEvent e) {
 
     }
@@ -203,6 +166,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             switch (code) {
                 case VK_ESCAPE:
                     state = PAUSE;
+                    break;
+                case VK_Q:
+                    Block place = map.powerups.get(rng.nextInt(map.powerups.size()));
+                    powerups.add(new Powerup(place.x, place.y, rng.nextInt(6)));
                     break;
 
                 case VK_X:
@@ -391,6 +358,28 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         keys[e.getKeyCode()] = false;
     }
 
+    public void powerupCalc() {
+        if (map.powerups.size() > 0 &&
+            timer % (FPS * 5) == 1 &&
+            rng.nextBoolean()) {
+            Block place = map.powerups.get(rng.nextInt(map.powerups.size()));
+            powerups.add(new Powerup(place.x, place.y, rng.nextInt(6)));
+        }
+        
+        for (Powerup p : powerups) {
+            if (p.intersects(player1)) {
+                player1.getPowerup(p.type);
+                p.alive = false;
+            }
+
+            if (p.intersects(player2)) {
+                player2.getPowerup(p.type);
+                p.alive = false;
+            }
+        }
+
+        powerups.removeIf(p -> !p.alive);
+    }
 
     public void playerCalc() {
         // Player 1 Movement
@@ -443,28 +432,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         arrows.removeIf(a -> !a.alive);
     }
 
-    public void powerupCalc() {
-        if (map.powerups.size() > 0 &&
-            timer % (FPS * 5) == 1 &&
-            rng.nextBoolean()) {
-            Block place = map.powerups.get(rng.nextInt(map.powerups.size()));
-            powerups.add(new Powerup(place.x, place.y, rng.nextInt(6)));
-        }
-        
-        for (Powerup p : powerups) {
-            if (p.intersects(player1)) {
-                player1.getPowerup(p.type);
-                p.alive = false;
-            }
-
-            if (p.intersects(player2)) {
-                player2.getPowerup(p.type);
-                p.alive = false;
-            }
-        }
-
-        powerups.removeIf(p -> !p.alive);
-    }
 
     public void paintComponent(Graphics g) {
         switch (state) {
@@ -524,7 +491,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
         g.setColor(Color.yellow);
         for (Powerup p : powerups) {
-            fillRect(g, p);
+            g.drawImage(p.getSprite(tex), p.x, p.y, this);
+            // fillRect(g, p);
         }
 
         g.setColor(Color.green);
