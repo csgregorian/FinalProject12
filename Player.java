@@ -57,10 +57,6 @@ public class Player extends Rectangle implements Globals {
 		touch_right = touch_left = touch_up = touch_down = false;
 	}
 
-	public void tick() {
-
-	}
-
 	public void accelerate(int direction) {
 		/* Changes velocity.
 		 * Run when L/R directional keys are held down */
@@ -294,9 +290,78 @@ public class Player extends Rectangle implements Globals {
 		vely += a.vely;
 	}
 
+	public void getPowerup(int type) {
+		powerup_timer = 600;
+
+		if (powerup != NONE) {
+			removePowerup();
+		}
+
+		powerup = type;
+		switch (powerup) {
+			case NONE:
+				break;
+
+			case SPEED:
+				maxvelx *= 2;
+				break;
+
+			case JUMP:
+				jumpy *= 2;
+				gravy *= 2;
+
+			case BULLET:
+				arrowspeed *= 2;
+				break;
+
+			case FLY:
+				break;
+
+			case AMMO:
+				break;
+
+			default:
+				break;
+
+		}
+	}
+
+	public void removePowerup() {
+		switch (powerup) {
+			case NONE:
+				break;
+
+			case SPEED:
+				maxvelx /= 2;
+
+			case JUMP:
+				jumpy /= 2;
+				gravy /= 2;
+
+			case BULLET:
+				arrowspeed /= 2;
+				break;
+
+			case FLY:
+				break;
+
+			case AMMO:
+				break;
+
+			default:
+				break;
+		}
+
+		powerup = NONE;
+	}
 
 	public void checkPowerup() {
-		
+		System.out.println(powerup);
+		powerup_timer--;
+
+		if (powerup_timer == 0) {
+			removePowerup();
+		}
 	}
 
 	public Rectangle rectRight() {

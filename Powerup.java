@@ -12,9 +12,9 @@ public class Powerup extends Rectangle implements Globals {
 
 	boolean alive = true;
 
-	public Powerup(int x, int y, int type) {
-		this.x = x;
-		this.y = y;
+	public Powerup(int startx, int starty, int type) {
+		x = startx;
+		y = starty;
 
 		this.type = type;
 

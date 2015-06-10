@@ -414,12 +414,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             player2.accelerate(LEFT);
         }
 
-        player1.tick();
         player1.move(map);
         player1.fall();
         player1.checkPowerup();
         
-        player2.tick();
         player2.move(map);
         player2.fall();
         player2.checkPowerup();
@@ -455,58 +453,49 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         
         for (Powerup p : powerups) {
             if (p.intersects(player1)) {
-                player1.powerup = p.type;
-                player1.powerup_timer = 600;
+                player1.getPowerup(p.type);
                 p.alive = false;
             }
 
             if (p.intersects(player2)) {
-                player2.powerup = p.type;
-                player2.powerup_timer = 600;
+                player2.getPowerup(p.type);
                 p.alive = false;
             }
         }
 
-        arrows.removeIf(p -> !p.alive);
+        powerups.removeIf(p -> !p.alive);
     }
 
     public void paintComponent(Graphics g) {
         switch (state) {
             case INTRO:
-                paintIntroBackground(g);
+                paintIntro(g);
                 break;
+
             case GAME:
-                paintGameBackground(g);
-                paintGamePlayers(g);
-                paintGameArrows(g);
-                paintGameOverlay(g);
+                paintGame(g);
                 break;
 
             case PAUSE:
-                paintGameBackground(g);
-                paintGamePlayers(g);
-                paintGameArrows(g);
-                paintGameOverlay(g);
-                paintPauseMenu(g);
+                paintGame(g);
+                paintPause(g);
                 break;
 
             case PLAYERMENU:
                 paintPlayerMenu(g);
-                paintPlayerOverlay(g);
                 break;
 
             case MAPMENU:
                 paintMapMenu(g);
-                paintMapOverlay(g);
                 break;
         }
     }
 
-    public void paintIntroBackground(Graphics g) {
+    public void paintIntro(Graphics g) {
         g.drawImage(tex.getTexture("Background"), 0, 0, this);
     }
 
-    public void paintGameBackground(Graphics g) {
+    public void paintGame(Graphics g) {
         g.setColor(Color.white);
         g.fillRect(0, 0, sizex, sizey);
         g.drawImage(tex.getTexture(map.name), 0, 0, 1280, 640, this);
@@ -516,34 +505,44 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         //  fillRect(g, b);
         // }
 
+
+        for (int x = -1280; x <= 1280; x += 1280) {
+            for (int y = -640; y <= 640; y += 640) {
+                g.drawImage(
+                    player1.getSprite(tex),
+                    player1.x + x, player1.y + y,
+                    player1.width, player1.height, this
+                );
+
+                g.drawImage(
+                    player2.getSprite(tex),
+                    player2.x + x, player2.y + y,
+                    player2.width, player2.height, this
+                );
+            }
+        }
+
         g.setColor(Color.yellow);
         for (Powerup p : powerups) {
             fillRect(g, p);
         }
-    }
 
-    public void paintGamePlayers(Graphics g) {
-        g.drawImage(player1.getSprite(tex), player1.x, player1.y, player1.width, player1.height, this);
-        g.drawImage(player1.getSprite(tex), player1.x-sizex, player1.y, this);
-        g.drawImage(player1.getSprite(tex), player1.x+sizex, player1.y, this);
-        g.drawImage(player1.getSprite(tex), player1.x, player1.y-sizey, this);
-        g.drawImage(player1.getSprite(tex), player1.x, player1.y+sizey, this);
-
-        g.drawImage(player2.getSprite(tex), player2.x, player2.y, player2.width, player2.height, this);
-        g.drawImage(player2.getSprite(tex), player2.x-sizex, player2.y, this);
-        g.drawImage(player2.getSprite(tex), player2.x+sizex, player2.y, this);
-        g.drawImage(player2.getSprite(tex), player2.x, player2.y-sizey, this);
-        g.drawImage(player2.getSprite(tex), player2.x, player2.y+sizey, this);
-    }
-
-    public void paintGameArrows(Graphics g) {
         g.setColor(Color.green);
         for (Arrow a : arrows) {
             g.drawImage(a.getSprite(tex), a.x, a.y, this);
         }
-    }
 
-    public void paintGameOverlay(Graphics g) {
+        g.drawImage(tex.getTexture("Overlay"), 0, 640, this);
+
+        g.setColor(new Color(200, 200, 200));
+        g.setFont(new Font("Droid Sans", Font.PLAIN, 32));
+        g.drawString("Player 1", 32, 690);
+        g.drawString("Player 2", 1100, 690);
+
+        g.setColor(Color.red);
+        g.fillRect(32, 692, 32*player1.hp, 4);
+        g.fillRect(1100, 692, 32*player2.hp, 4);
+
         g.drawImage(tex.getTexture("Overlay"), 0, 640, this);
 
         g.setColor(new Color(200, 200, 200));
@@ -563,7 +562,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         g.fillRect(156 + (map_cursor % 2) * 640,
                    76 + (map_cursor / 2) * 320, 328, 168);
 
-        g.setColor(Color.red);
         for (int i = 0; i < map_names.size(); i++) {
             g.drawImage(tex.getTexture(map_names.get(i)),
                        160 + ((i % 2) * 640),
@@ -572,10 +570,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
                        160,
                        this);
         }
-    }
-
-    public void paintMapOverlay(Graphics g) {
         g.drawImage(tex.getTexture("Overlay"), 0, 640, this);
+
     }
 
     public void paintPlayerMenu(Graphics g) {
@@ -586,13 +582,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
         g.drawImage(tex.getTexture(p1), 160, 160, 320, 320, this);
         g.drawImage(tex.getTexture(p2), 700, 160, 320, 320, this);
-    }
 
-    public void paintPlayerOverlay(Graphics g) {
         g.drawImage(tex.getTexture("Overlay"), 0, 640, this);
     }
 
-    public void paintPauseMenu(Graphics g) {
+    public void paintPause(Graphics g) {
         g.setColor(new Color(0, 0, 0, 100));
         g.fillRect(0, 0, 1280, 640);
     }
