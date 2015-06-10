@@ -8,10 +8,7 @@ import javax.imageio.*;
 import java.util.HashMap;
 import java.util.ArrayList;
 
-public class Map implements  Globals {
-	//  Globals
-	final static int RIGHT = 0, LEFT = 1, DOWN = 2, UP = 3;
-	final static int NONE = 0, SPEED = 1, JUMP = 2, BULLET = 3;
+public class Map implements Globals {
 
 
 	ArrayList<Block> blocks = new ArrayList<>();

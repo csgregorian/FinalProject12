@@ -7,7 +7,7 @@ import javax.imageio.*;
 
 import java.util.HashMap;
 
-public class Player extends Rectangle implements  Globals {
+public class Player extends Rectangle implements Globals {
 	String name;
 
 	// Velocity
@@ -30,9 +30,6 @@ public class Player extends Rectangle implements  Globals {
 	// Collisions
 	boolean touch_right, touch_left, touch_up, touch_down;
 
-	// Time
-	int timer = 0;
-
 	// Arrows
 	int arrows = 8;
 	int arrowspeed = 16;
@@ -48,24 +45,20 @@ public class Player extends Rectangle implements  Globals {
 	int powerup = 0;
 	int powerup_timer = 0;
 
-	//  Globals
-	final static int RIGHT = 0, LEFT = 1, DOWN = 2, UP = 3;
-	final static int NONE = 0, SPEED = 1, JUMP = 2, BULLET = 3;
-
 	public Player(String name, int startx, int starty) {
 		this.name = name;
 
 		x = startx;
 		y = starty;
 
-		width = 32;
-		height = 32;
+		width = PLAYERSIZE;
+		height = PLAYERSIZE;
 
 		touch_right = touch_left = touch_up = touch_down = false;
 	}
 
 	public void tick() {
-		timer++;
+
 	}
 
 	public void accelerate(int direction) {
@@ -169,7 +162,6 @@ public class Player extends Rectangle implements  Globals {
 						x -= 1280;
 					}
 
-					getPowerup(map);
 				}
 
 				// No collision on right
@@ -209,7 +201,7 @@ public class Player extends Rectangle implements  Globals {
 						x -= 1280;
 					}
 
-					getPowerup(map);
+					
 				}
 
 				// No collision on left
@@ -248,7 +240,7 @@ public class Player extends Rectangle implements  Globals {
 						y -= 640;
 					}
 
-					getPowerup(map);
+					
 				}
 
 				// No collision on bottom
@@ -279,7 +271,6 @@ public class Player extends Rectangle implements  Globals {
 						y -= 640;
 					}
 
-					getPowerup(map);
 				}
 
 				// No collision on top
@@ -303,28 +294,25 @@ public class Player extends Rectangle implements  Globals {
 		vely += a.vely;
 	}
 
-	public void getPowerup(Map map) {
-		
-	}
 
 	public void checkPowerup() {
 		
 	}
 
 	public Rectangle rectRight() {
-		return new Rectangle(x + 32, y, 1, 31);
+		return new Rectangle(x + width, y, 1, height - 1);
 	}
 
 	public Rectangle rectLeft() {
-		return new Rectangle(x-1, y + 1, 1, 30);
+		return new Rectangle(x-1, y + 1, 1, height - 2);
 	}
 
 	public Rectangle rectTop() {
-		return new Rectangle(x, y, 32, 1);
+		return new Rectangle(x, y, width, 1);
 	}
 
 	public Rectangle rectBottom() {
-		return new Rectangle(x, y + 32, 32, 1);
+		return new Rectangle(x, y + height, width, 1);
 	}
 
 	public BufferedImage getSprite(TextureManager tex) {

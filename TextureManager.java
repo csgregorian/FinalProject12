@@ -7,7 +7,7 @@ import javax.imageio.*;
 
 import java.util.HashMap;
 
-public class TextureManager implements  Globals {
+public class TextureManager implements Globals {
 	private HashMap<String, BufferedImage> textures;
 
 	public TextureManager() {

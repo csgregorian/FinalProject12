@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener,  Globals {
+public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener, Globals {
     // Window size
     int sizex, sizey;
 
@@ -50,7 +50,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     // Game State
     int state = INTRO;
-    int time = 0;
+    int timer = 0;
 
 
     public GamePanel(int x, int y) {
@@ -75,7 +75,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     public void resetMap(String mapname) {
-        time = 0;
+        timer = 0;
         arrows.clear();
         powerups.clear();
         map = maps.get(mapname);   
@@ -240,19 +240,19 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
                 case VK_C:
                     if (keys[VK_DOWN] && !keys[VK_UP]) {
-                        a = new Arrow(player1.x, player1.y, Arrow.DOWN, player1.arrowspeed);
+                        a = new Arrow(player1, DOWN);
                     } else
                     if (keys[VK_UP] && !keys[VK_DOWN]) {
-                        a = new Arrow(player1.x, player1.y, Arrow.UP, player1.arrowspeed);
+                        a = new Arrow(player1, UP);
                     } else
                     if (keys[VK_LEFT] && !keys[VK_RIGHT]) {
-                        a = new Arrow(player1.x, player1.y, Arrow.LEFT, player1.arrowspeed);
+                        a = new Arrow(player1, LEFT);
                     } else
                     if (keys[VK_RIGHT] && !keys[VK_LEFT]) {
-                        a = new Arrow(player1.x, player1.y, Arrow.RIGHT, player1.arrowspeed);
+                        a = new Arrow(player1, RIGHT);
                     } else
                     if (!(keys[VK_RIGHT] || keys[VK_LEFT] || keys[VK_DOWN] || keys[VK_UP])) {
-                        a = new Arrow(player1.x, player1.y, player1.last_input, player1.arrowspeed);
+                        a = new Arrow(player1, player1.last_input);
                     }
 
                     if (a != null) {
@@ -262,19 +262,19 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
                 case VK_D:
                     if (keys[VK_K] && !keys[VK_I]) {
-                        a = new Arrow(player2.x, player2.y, Arrow.DOWN, player2.arrowspeed);
+                        a = new Arrow(player2, DOWN);
                     } else
                     if (keys[VK_I] && !keys[VK_K]) {
-                        a = new Arrow(player2.x, player2.y, Arrow.UP, player2.arrowspeed);
+                        a = new Arrow(player2, UP);
                     } else
                     if (keys[VK_J] && !keys[VK_L]) {
-                        a = new Arrow(player2.x, player2.y, Arrow.LEFT, player2.arrowspeed);
+                        a = new Arrow(player2, LEFT);
                     } else
                     if (keys[VK_L] && !keys[VK_J]) {
-                        a = new Arrow(player2.x, player2.y, Arrow.RIGHT, player2.arrowspeed);
+                        a = new Arrow(player2, RIGHT);
                     } else
                     if (!(keys[VK_RIGHT] || keys[VK_LEFT] || keys[VK_DOWN] || keys[VK_UP])) {
-                        a = new Arrow(player2.x, player2.y, player2.last_input, player2.arrowspeed);
+                        a = new Arrow(player2, player2.last_input);
                     }
                     
                     if (a != null) {
@@ -381,7 +381,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     }
 
     public void gameTick() {
-        time++;
+        timer++;
         powerupCalc();
         playerCalc();
         arrowCalc();
@@ -391,21 +391,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         keys[e.getKeyCode()] = false;
     }
 
-    public void powerupCalc() {
-        // Every 5 seconds, 50% chance to add a powerup.
-        if (map.powerups.size() > 0 &&
-            time % (FPS * 5) == 1 &&
-            rng.nextBoolean()) {
-            Block place = map.powerups.get(rng.nextInt(map.powerups.size()));
-            powerups.add(new Powerup(place.x, place.y, rng.nextInt(6)));
-        }
-    }
 
     public void playerCalc() {
-        // Time
-        player1.tick();
-        player2.tick();
-
         // Player 1 Movement
         if (keys[VK_RIGHT] == keys[VK_LEFT] ||
             keys[VK_Z]) {
@@ -417,9 +404,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             player1.accelerate(LEFT);
         }
 
-        player1.move(map);
-        player1.fall();
-
         if (keys[VK_L] == keys[VK_J] ||
             keys[VK_A]) {
             // XNOR: both or neither are pressed
@@ -430,13 +414,19 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
             player2.accelerate(LEFT);
         }
 
+        player1.tick();
+        player1.move(map);
+        player1.fall();
+        player1.checkPowerup();
+        
+        player2.tick();
         player2.move(map);
         player2.fall();
+        player2.checkPowerup();
     }
 
     public void arrowCalc() {
         for (Arrow a : arrows) {
-            a.fall();
             a.move(map);
 
             if (a.intersects(player1)) {
@@ -453,6 +443,31 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         }
 
         arrows.removeIf(a -> !a.alive);
+    }
+
+    public void powerupCalc() {
+        if (map.powerups.size() > 0 &&
+            timer % (FPS * 5) == 1 &&
+            rng.nextBoolean()) {
+            Block place = map.powerups.get(rng.nextInt(map.powerups.size()));
+            powerups.add(new Powerup(place.x, place.y, rng.nextInt(6)));
+        }
+        
+        for (Powerup p : powerups) {
+            if (p.intersects(player1)) {
+                player1.powerup = p.type;
+                player1.powerup_timer = 600;
+                p.alive = false;
+            }
+
+            if (p.intersects(player2)) {
+                player2.powerup = p.type;
+                player2.powerup_timer = 600;
+                p.alive = false;
+            }
+        }
+
+        arrows.removeIf(p -> !p.alive);
     }
 
     public void paintComponent(Graphics g) {
@@ -494,27 +509,31 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     public void paintGameBackground(Graphics g) {
         g.setColor(Color.white);
         g.fillRect(0, 0, sizex, sizey);
-        g.drawImage(tex.getTexture(map.name), 0, 0, this);
+        g.drawImage(tex.getTexture(map.name), 0, 0, 1280, 640, this);
 
         g.setColor(Color.black);
         // for (Block b : map.blocks) {
         //  fillRect(g, b);
         // }
 
+        g.setColor(Color.yellow);
+        for (Powerup p : powerups) {
+            fillRect(g, p);
+        }
     }
 
     public void paintGamePlayers(Graphics g) {
-        g.drawImage(player1.getSprite(tex), player1.x, player1.y, this);
-        g.drawImage(player1.getSprite(tex), player1.x-1280, player1.y, this);
-        g.drawImage(player1.getSprite(tex), player1.x+1280, player1.y, this);
-        g.drawImage(player1.getSprite(tex), player1.x, player1.y-640, this);
-        g.drawImage(player1.getSprite(tex), player1.x, player1.y+640, this);
+        g.drawImage(player1.getSprite(tex), player1.x, player1.y, player1.width, player1.height, this);
+        g.drawImage(player1.getSprite(tex), player1.x-sizex, player1.y, this);
+        g.drawImage(player1.getSprite(tex), player1.x+sizex, player1.y, this);
+        g.drawImage(player1.getSprite(tex), player1.x, player1.y-sizey, this);
+        g.drawImage(player1.getSprite(tex), player1.x, player1.y+sizey, this);
 
-        g.drawImage(player2.getSprite(tex), player2.x, player2.y, this);
-        g.drawImage(player2.getSprite(tex), player2.x-1280, player2.y, this);
-        g.drawImage(player2.getSprite(tex), player2.x+1280, player2.y, this);
-        g.drawImage(player2.getSprite(tex), player2.x, player2.y-640, this);
-        g.drawImage(player2.getSprite(tex), player2.x, player2.y+640, this);
+        g.drawImage(player2.getSprite(tex), player2.x, player2.y, player2.width, player2.height, this);
+        g.drawImage(player2.getSprite(tex), player2.x-sizex, player2.y, this);
+        g.drawImage(player2.getSprite(tex), player2.x+sizex, player2.y, this);
+        g.drawImage(player2.getSprite(tex), player2.x, player2.y-sizey, this);
+        g.drawImage(player2.getSprite(tex), player2.x, player2.y+sizey, this);
     }
 
     public void paintGameArrows(Graphics g) {

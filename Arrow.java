@@ -9,21 +9,17 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Arrow extends Rectangle implements  Globals {
-	//  Globals
-	final static int RIGHT = 0, LEFT = 1, DOWN = 2, UP = 3;
+public class Arrow extends Rectangle implements Globals {
 
 	double velx = 0,
 		   vely = 0;
-
-	double gravy = 0;
 
 	int direction;
 
 	boolean alive = true;
 
 
-	public Arrow(int startx, int starty, int dir, int vel) {
+	public Arrow(Player player, int dir) {
 		/* Constructs the arrow one tile over in the given direction
 		 * from the source tile.  Arrows are centred in the tile and
 		 * have a size of 32*16 when horizontal and 16*32 when vertical */
@@ -31,47 +27,48 @@ public class Arrow extends Rectangle implements  Globals {
 		direction = dir;
 
 		if (direction == RIGHT) {
-			x = startx + 32;
-			y = starty;
-
 			width = 32;
 			height = 16;
 
-			velx = vel;
+			x = player.x + player.width;
+			y = player.y;
+
+			velx = player.arrowspeed;
+
 		} else
 		if (direction == LEFT) {
-			x = startx - 32;
-			y = starty;
-
 			width = 32;
 			height = 16;
 
-			velx = -vel;
+			x = player.x - width;
+			y = player.y;
+
+
+			velx = -player.arrowspeed;
+
 		} else
 		if (direction == DOWN) {
-			x = startx + 8;
-			y = starty + 32;
-
 			width = 16;
 			height = 32;
 
-			vely = vel;
+			x = player.x + player.width / 2 - width / 2;
+			y = player.y + player.height;
+
+			vely = player.arrowspeed;
+
 		} else
 		if (direction == UP) {
-			x = startx + 8;
-			y = starty - 32;
-
 			width = 16;
 			height = 32;
 
-			vely = -vel;
+			x = player.x + player.width / 2 - width / 2;
+			y = player.y - height;
+
+			vely = -player.arrowspeed;
+
 		} else {
 			System.err.println("Invalid direction");
 		}
-	}
-
-	public void fall() {
-		vely += gravy;
 	}
 
 	public void move(Map map) {

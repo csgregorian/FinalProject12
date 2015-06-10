@@ -8,6 +8,9 @@ public interface Globals {
 	// Framerate
 	final static int FPS = 60;
 
+	// Player
+	final static int PLAYERSIZE = 48;
+
 	// Tiles
 	final static int TILESIZE = 32, TILEX = 40, TILEY = 20;
 

@@ -7,8 +7,10 @@ import javax.imageio.*;
 
 import java.util.HashMap;
 
-public class Powerup extends Rectangle implements  Globals {
+public class Powerup extends Rectangle implements Globals {
 	int type;
+
+	boolean alive = true;
 
 	public Powerup(int x, int y, int type) {
 		this.x = x;
