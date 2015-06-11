@@ -28,11 +28,15 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
 
     // Players
     ArrayList<String> players = new ArrayList<String>();
-    Player player1 = new Player("Link", 7*32, 5*32),
-           player2 = new Player("BlackLink", 34*32, 5*32);
+    Player player1 = new Player("Link", "Bow", 7*32, 5*32),
+           player2 = new Player("BlackLink", "IceBow", 34*32, 5*32);
+
+    ArrayList<String> bows = new ArrayList<String>();
 
     int player1_cursor = 0;
+    int bow1_cursor = 0;
     int player2_cursor = 1;
+    int bow2_cursor = 0;
 
     // Maps
     HashMap<String, Map> maps = new HashMap<>();
@@ -76,9 +80,9 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
         map = maps.get(mapname);   
     }
 
-    public void resetPlayers(String name1, String name2) {
-        player1 = new Player(name1, 7*32, 5*32);
-        player2 = new Player(name2, 34*32, 5*32);
+    public void resetPlayers(String name1, String name2, String bow1, String bow2) {
+        player1 = new Player(name1, bow1, 7*32, 5*32);
+        player2 = new Player(name2, bow2, 34*32, 5*32);
     }
 
     public void loadImages() {
@@ -143,7 +147,23 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
                 players.add(player_list.next());
             }
         } catch (FileNotFoundException e) {
-            System.err.println("res/img/images_list.txt not found");
+            System.err.println("res/img/player_list.txt not found");
+            System.exit(0);
+        } catch (Exception e) {
+            System.err.println(e);
+            System.exit(0);
+        }
+
+        Scanner bow_list;
+
+        try {
+            bow_list = new Scanner(new File("res/img/bow_list.txt"));
+
+            while (bow_list.hasNext()) {
+                bows.add(bow_list.next());
+            }
+        } catch (FileNotFoundException e) {
+            System.err.println("res/img/bow_list.txt not found");
             System.exit(0);
         } catch (Exception e) {
             System.err.println(e);
@@ -222,9 +242,11 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
                         a = new Arrow(player1, player1.last_input);
                     }
 
-                    if (a != null) {
+                    if (a != null && player1.arrows > 0) {
+                        player1.shoot(a.direction);
                         arrows.add(a);
                     }
+
                     break;
 
                 case VK_D:
@@ -244,7 +266,8 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
                         a = new Arrow(player2, player2.last_input);
                     }
                     
-                    if (a != null) {
+                     if (a != null && player2.arrows > 0) {
+                        player2.shoot(a.direction);
                         arrows.add(a);
                     }
                     break;
@@ -262,6 +285,7 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
                     }
                     player1_cursor = player1_cursor % players.size();
                     break;
+
                 case VK_LEFT:
                     player1_cursor--;
                     if (player1_cursor == player2_cursor) {
@@ -269,6 +293,17 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
                     }
                     player1_cursor = (player1_cursor + players.size()) % players.size();
                     break;
+
+                case VK_DOWN:
+                    bow1_cursor++;
+                    bow1_cursor = bow1_cursor % bows.size();
+                    break;
+
+                case VK_UP:
+                    bow1_cursor--;
+                    bow1_cursor = (bow1_cursor + bows.size()) % bows.size();
+                    break;
+
                 case VK_L:
                     player2_cursor++;
                     player2_cursor = player2_cursor % players.size();
@@ -277,6 +312,7 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
                     }
                     player2_cursor = player2_cursor % players.size();
                     break;
+
                 case VK_J:
                     player2_cursor--;
                     if (player2_cursor == player1_cursor) {
@@ -284,13 +320,27 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
                     }
                     player2_cursor = (player2_cursor + players.size()) % players.size();
                     break;
+
+                case VK_K:
+                    bow2_cursor++;
+                    bow2_cursor = bow2_cursor % bows.size();
+                    break;
+
+                case VK_I:
+                    bow2_cursor--;
+                    bow2_cursor = (bow2_cursor + bows.size()) % bows.size();
+                    break;
+
                 case VK_ENTER:
                     state = MAPMENU;
-                    resetPlayers(players.get(player1_cursor), players.get(player2_cursor));
+                    resetPlayers(players.get(player1_cursor), players.get(player2_cursor),
+                                 bows.get(bow1_cursor), bows.get(player2_cursor));
                     break;
+
                 case VK_ESCAPE:
                     // state = INTRO;
                     break;
+
                 default:
                     break;
             }
@@ -363,10 +413,12 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
             timer % (FPS * 5) == 1 &&
             rng.nextBoolean()) {
             Block place = map.powerups.get(rng.nextInt(map.powerups.size()));
-            powerups.add(new Powerup(place.x, place.y, rng.nextInt(6)));
+            powerups.add(new Powerup(place.x, place.y, rng.nextInt(7)));
         }
         
         for (Powerup p : powerups) {
+            p.tick();
+
             if (p.intersects(player1)) {
                 player1.getPowerup(p.type);
                 p.alive = false;
@@ -383,33 +435,39 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
 
     public void playerCalc() {
         // Player 1 Movement
-        if (keys[VK_RIGHT] == keys[VK_LEFT] ||
-            keys[VK_Z]) {
-            // XNOR: both or neither are pressed
-            player1.drag();
-        } else if (keys[VK_RIGHT]) {
-            player1.accelerate(RIGHT);
-        } else if (keys[VK_LEFT]) {
-            player1.accelerate(LEFT);
+
+        if (player2.powerup != TIME || timer % 2 == 0) {
+            if (keys[VK_RIGHT] == keys[VK_LEFT] ||
+                keys[VK_Z]) {
+                // XNOR: both or neither are pressed
+                player1.drag();
+            } else if (keys[VK_RIGHT]) {
+                player1.accelerate(RIGHT);
+            } else if (keys[VK_LEFT]) {
+                player1.accelerate(LEFT);
+            }
+
+            player1.move(map);
+            player1.fall();
         }
 
-        if (keys[VK_L] == keys[VK_J] ||
-            keys[VK_A]) {
-            // XNOR: both or neither are pressed
-            player2.drag();
-        } else if (keys[VK_L]) {
-            player2.accelerate(RIGHT);
-        } else if (keys[VK_J]) {
-            player2.accelerate(LEFT);
-        }
+        if (player1.powerup != TIME || timer % 2 == 0) {
+            if (keys[VK_L] == keys[VK_J] ||
+                keys[VK_A]) {
+                // XNOR: both or neither are pressed
+                player2.drag();
+            } else if (keys[VK_L]) {
+                player2.accelerate(RIGHT);
+            } else if (keys[VK_J]) {
+                player2.accelerate(LEFT);
+            }
 
-        player1.move(map);
-        player1.fall();
-        player1.checkPowerup();
+            player2.move(map);
+            player2.fall(); 
+        }
         
-        player2.move(map);
-        player2.fall();
-        player2.checkPowerup();
+        player1.tick();
+        player2.tick();
     }
 
     public void arrowCalc() {
@@ -481,6 +539,24 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
                     player1.width, player1.height, this
                 );
 
+                int bowx, bowy;
+                switch (player1.last_input) {
+                    case RIGHT:
+                        bowx = player1.x + x + player1.width;
+                        bowy = player1.y + y + player1.height;
+                        break;
+
+                    case LEFT:
+                        bowx = player1.x + x - player1.width;
+                        bowy = player1.y + y - player1.height;
+                        break;
+
+                    case UP:
+                        
+
+
+                }
+
                 g.drawImage(
                     player2.getSprite(tex),
                     player2.x + x, player2.y + y,
@@ -503,7 +579,7 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
         g.drawImage(tex.getTexture("Overlay"), 0, 640, this);
 
         g.setColor(new Color(200, 200, 200));
-        g.setFont(new Font("Droid Sans", Font.PLAIN, 32));
+        g.setFont(new Font("Segoe UI", Font.PLAIN, 32));
         g.drawString("Player 1", 32, 690);
         g.drawString("Player 2", 1100, 690);
 
@@ -514,7 +590,7 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
         g.drawImage(tex.getTexture("Overlay"), 0, 640, this);
 
         g.setColor(new Color(200, 200, 200));
-        g.setFont(new Font("Droid Sans", Font.PLAIN, 32));
+        g.setFont(new Font("Segoe UI", Font.PLAIN, 32));
         g.drawString("Player 1", 32, 690);
         g.drawString("Player 2", 1100, 690);
 
@@ -548,20 +624,49 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
         String p1 = String.format("%s-D-0", players.get(player1_cursor));
         String p2 = String.format("%s-D-0", players.get(player2_cursor));
 
-        g.drawImage(tex.getTexture(p1), 160, 160, 320, 320, this);
-        g.drawImage(tex.getTexture(p2), 700, 160, 320, 320, this);
+        String b1 = String.format("%s-D", bows.get(bow1_cursor));
+        String b2 = String.format("%s-D", bows.get(bow2_cursor));
+
+
+        g.drawImage(tex.getTexture(p1), 160, 160, 160, 160, this);
+        g.drawImage(tex.getTexture(b1), 320, 160, 160, 160, this);
+
+        g.drawImage(tex.getTexture(p2), 700, 160, 160, 160, this);
+        g.drawImage(tex.getTexture(b2), 860, 160, 160, 160, this);
 
         g.drawImage(tex.getTexture("Overlay"), 0, 640, this);
     }
 
     public void paintPause(Graphics g) {
-        g.setColor(new Color(0, 0, 0, 100));
+        g.setColor(new Color(0, 0, 0, 128));
         g.fillRect(0, 0, 1280, 640);
+
+        g.setColor(Color.white);
+        g.setFont(new Font("Segoe UI", Font.PLAIN, 64));
+        g.drawString("Press ENTER to exit.", 300, 298); 
     }
 
     public void fillRect(Graphics g, Rectangle rect) {
         g.fillRect(rect.x, rect.y, rect.width, rect.height);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

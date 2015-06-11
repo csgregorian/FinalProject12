@@ -9,6 +9,7 @@ import java.util.HashMap;
 
 public class Player extends Rectangle implements Globals {
 	String name;
+	String bow;
 
 	// Velocity
 	double velx = 0,
@@ -31,7 +32,7 @@ public class Player extends Rectangle implements Globals {
 	boolean touch_right, touch_left, touch_up, touch_down;
 
 	// Arrows
-	int arrows = 8;
+	int arrows = 5;
 	int arrowspeed = 16;
 
 	// Last input
@@ -43,10 +44,15 @@ public class Player extends Rectangle implements Globals {
 
 	// Powerups
 	int powerup = 0;
-	int powerup_timer = 0;
 
-	public Player(String name, int startx, int starty) {
+	// Timers
+	int powerup_timer = 0;
+	int hurt_timer = 60;
+	int shoot_timer = 0;
+
+	public Player(String name, String bow, int startx, int starty) {
 		this.name = name;
+		this.bow = bow;
 
 		x = startx;
 		y = starty;
@@ -55,6 +61,24 @@ public class Player extends Rectangle implements Globals {
 		height = PLAYERSIZE;
 
 		touch_right = touch_left = touch_up = touch_down = false;
+	}
+
+	public void tick() {
+		if (powerup != NONE) {
+			powerup_timer--;
+			if (powerup_timer <= 0) {
+				removePowerup();
+			}
+		}
+
+		if (hurt_timer > 0) {
+			hurt_timer--;
+		}
+
+
+		if (hp <= 0) {
+			alive = false;
+		}
 	}
 
 	public void accelerate(int direction) {
@@ -273,16 +297,20 @@ public class Player extends Rectangle implements Globals {
 				touch_up = false;
 			}
 		}
-		
+	}
 
-		
+	public void shoot(int direction) {
+		arrows--;
+		last_input = direction;
+		shoot_time = 30;
 	}
 
 	public void hurt() {
-		hp--;
-		if (hp <= 0) {
-			alive = false;
+		if (hurt_timer <= 0) {
+			hp--;
+			hurt_timer = 60;
 		}
+
 	}
 
 	public void knockback(Arrow a) {
@@ -315,6 +343,9 @@ public class Player extends Rectangle implements Globals {
 				break;
 
 			case AMMO:
+				break;
+
+			case TIME:
 				break;
 
 			default:
@@ -351,23 +382,15 @@ public class Player extends Rectangle implements Globals {
 			case AMMO:
 				break;
 
+			case TIME:
+				break;
+
 			default:
 				break;
 		}
 
 		powerup_timer = 0;
 		powerup = NONE;
-	}
-
-	public void checkPowerup() {
-		if (powerup != NONE) {
-			powerup_timer--;
-			if (powerup_timer <= 0) {
-				removePowerup();
-			}
-		}
-
-		
 	}
 
 	public Rectangle rectRight() {
@@ -387,10 +410,13 @@ public class Player extends Rectangle implements Globals {
 	}
 
 	public BufferedImage getSprite(TextureManager tex) {
+		if (hurt_timer > 0 && (hurt_timer % 8 / 4) == 0) {
+			return null;
+		}
+
 		String template = "%s-%s-%d";
 		switch (last_input) {
 			case RIGHT:
-				System.out.println(String.format(template, name, "R", (x % 1000) / 500));
 				return tex.getTexture(String.format(template, name, "R", (x % 100) / 50));
 			case LEFT:
 				return tex.getTexture(String.format(template, name, "L", (x % 100) / 50));
@@ -402,4 +428,29 @@ public class Player extends Rectangle implements Globals {
 				return tex.getTexture(String.format(template, name, "R", (x % 100) / 50));
 		}
 	}
+
+	public BufferedImage getSprite(TextureManager tex) {
+		if (shoot_timer <= 0) {
+			return null;
+		}
+
+		String template = "%s-%s";
+		switch (last_input) {
+			case RIGHT:
+				return tex.getTexture(String.format(template, bow, "R"));
+			case LEFT:
+				return tex.getTexture(String.format(template, bow, "L"));
+			case DOWN:
+				return tex.getTexture(String.format(template, bow, "D"));
+			case UP:
+				return tex.getTexture(String.format(template, bow, "U"));
+			default:
+				return tex.getTexture(String.format(template, bow, "R"));
+		}
+	}
 }
+
+
+
+
+

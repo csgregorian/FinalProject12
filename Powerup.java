@@ -10,7 +10,7 @@ import java.util.HashMap;
 public class Powerup extends Rectangle implements Globals {
 	int type;
 
-	int timer = 600;
+	int timer = 300;
 	boolean alive = true;
 
 	public Powerup(int startx, int starty, int type) {
@@ -22,7 +22,7 @@ public class Powerup extends Rectangle implements Globals {
 		width = height = 32;
 	}
 
-	public tick() {
+	public void tick() {
 		timer--;
 		if (timer <= 0) {
 			alive = false;
