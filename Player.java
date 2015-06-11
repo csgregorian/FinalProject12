@@ -75,6 +75,10 @@ public class Player extends Rectangle implements Globals {
 			hurt_timer--;
 		}
 
+		if (shoot_timer > 0) {
+			shoot_timer--;
+		}
+
 
 		if (hp <= 0) {
 			alive = false;
@@ -123,11 +127,15 @@ public class Player extends Rectangle implements Globals {
 	}
 
 	public void jump() {
+		if (powerup == FLY) {
+			// continue
+		} else
 		if (jumps == 0) {
 			return;
+		} else {
+			jumps--;
 		}
 
-		jumps--;
 		vely = jumpy;
 
 		if (!touch_down) {
@@ -302,7 +310,7 @@ public class Player extends Rectangle implements Globals {
 	public void shoot(int direction) {
 		arrows--;
 		last_input = direction;
-		shoot_time = 30;
+		shoot_timer = 30;
 	}
 
 	public void hurt() {
@@ -429,7 +437,7 @@ public class Player extends Rectangle implements Globals {
 		}
 	}
 
-	public BufferedImage getSprite(TextureManager tex) {
+	public BufferedImage getBowSprite(TextureManager tex) {
 		if (shoot_timer <= 0) {
 			return null;
 		}

@@ -30,6 +30,9 @@ public class Powerup extends Rectangle implements Globals {
 	}
 
 	public BufferedImage getSprite(TextureManager tex) {
+		if (type == NONE) {
+			return null;
+		}
 		return tex.getTexture("Powerup-" + Integer.toString(type));
 	}
 }

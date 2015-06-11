@@ -242,7 +242,7 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
                         a = new Arrow(player1, player1.last_input);
                     }
 
-                    if (a != null && player1.arrows > 0) {
+                    if (a != null && (player1.arrows > 0 || player1.powerup == AMMO)) {
                         player1.shoot(a.direction);
                         arrows.add(a);
                     }
@@ -266,7 +266,7 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
                         a = new Arrow(player2, player2.last_input);
                     }
                     
-                     if (a != null && player2.arrows > 0) {
+                     if (a != null && (player2.arrows > 0 || player2.powerup == AMMO)) {
                         player2.shoot(a.direction);
                         arrows.add(a);
                     }
@@ -472,6 +472,13 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
 
     public void arrowCalc() {
         for (Arrow a : arrows) {
+            for (Arrow ab : arrows) {
+                if (a != ab && a.intersects(ab)) {
+                    a.alive = false;
+                    ab.alive = false;
+                }
+            }
+
             a.move(map);
 
             if (a.intersects(player1)) {
@@ -518,6 +525,7 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
 
     public void paintIntro(Graphics g) {
         g.drawImage(tex.getTexture("Background"), 0, 0, this);
+        g.drawImage(tex.getTexture("Intro"), 0, 0, this);
     }
 
     public void paintGame(Graphics g) {
@@ -543,60 +551,96 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
                 switch (player1.last_input) {
                     case RIGHT:
                         bowx = player1.x + x + player1.width;
-                        bowy = player1.y + y + player1.height;
+                        bowy = player1.y + y;
                         break;
 
                     case LEFT:
                         bowx = player1.x + x - player1.width;
-                        bowy = player1.y + y - player1.height;
+                        bowy = player1.y + y;
+                        break;
+
+                    case DOWN:
+                        bowx = player1.x + x;
+                        bowy = player1.y + y + player1.height;
                         break;
 
                     case UP:
-                        
+                        bowx = player1.x + x;
+                        bowy = player1.y + y - player1.height;
+                        break;
 
-
+                    default:
+                        bowx = player1.x + x;
+                        bowy = player1.y + y;
+                        break;
                 }
+
+                g.drawImage(player1.getBowSprite(tex),
+                            bowx, bowy,
+                            player1.width, player1.height, this);
 
                 g.drawImage(
                     player2.getSprite(tex),
                     player2.x + x, player2.y + y,
                     player2.width, player2.height, this
                 );
+
+                switch (player2.last_input) {
+                    case RIGHT:
+                        bowx = player2.x + x + player2.width;
+                        bowy = player2.y + y;
+                        break;
+
+                    case LEFT:
+                        bowx = player2.x + x - player2.width;
+                        bowy = player2.y + y;
+                        break;
+
+                    case DOWN:
+                        bowx = player2.x + x;
+                        bowy = player2.y + y + player2.height;
+                        break;
+
+                    case UP:
+                        bowx = player2.x + x;
+                        bowy = player2.y + y - player2.height;
+                        break;
+
+                    default:
+                        bowx = player2.x + x;
+                        bowy = player2.y + y;
+                        break;
+                }
+
+                g.drawImage(player2.getBowSprite(tex),
+                            bowx, bowy,
+                            player2.width, player2.height, this);
             }
         }
 
-        g.setColor(Color.yellow);
         for (Powerup p : powerups) {
             g.drawImage(p.getSprite(tex), p.x, p.y, this);
-            // fillRect(g, p);
         }
 
-        g.setColor(Color.green);
         for (Arrow a : arrows) {
             g.drawImage(a.getSprite(tex), a.x, a.y, this);
         }
 
         g.drawImage(tex.getTexture("Overlay"), 0, 640, this);
 
-        g.setColor(new Color(200, 200, 200));
-        g.setFont(new Font("Segoe UI", Font.PLAIN, 32));
-        g.drawString("Player 1", 32, 690);
-        g.drawString("Player 2", 1100, 690);
+        g.drawImage(player1.getSprite(tex), 18, 648, 64, 64, this);
+        g.drawImage(player2.getSprite(tex), 1134, 648, 64, 64, this);
+
+        g.drawImage(new Powerup(0, 0, player1.powerup).getSprite(tex), 82, 648, 64, 64, this);
+        g.drawImage(new Powerup(0, 0, player2.powerup).getSprite(tex), 1198, 648, 64, 64, this);
 
         g.setColor(Color.red);
-        g.fillRect(32, 692, 32*player1.hp, 4);
-        g.fillRect(1100, 692, 32*player2.hp, 4);
+        g.fillRect(18, 640, 16*player1.hp, 4);
+        g.fillRect(1134, 640, 16*player2.hp, 4);
 
-        g.drawImage(tex.getTexture("Overlay"), 0, 640, this);
-
-        g.setColor(new Color(200, 200, 200));
-        g.setFont(new Font("Segoe UI", Font.PLAIN, 32));
-        g.drawString("Player 1", 32, 690);
-        g.drawString("Player 2", 1100, 690);
-
-        g.setColor(Color.red);
-        g.fillRect(32, 692, 32*player1.hp, 4);
-        g.fillRect(1100, 692, 32*player2.hp, 4);
+        g.setColor(Color.yellow);
+        g.fillRect(82, 640, player1.powerup_timer * 64 / 600, 4);
+        g.fillRect(1198, 640, player2.powerup_timer * 64 / 600, 4);
     }
 
     public void paintMapMenu(Graphics g) {
@@ -614,8 +658,7 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
                        160,
                        this);
         }
-        g.drawImage(tex.getTexture("Overlay"), 0, 640, this);
-
+        g.drawImage(tex.getTexture("MapMenu"), 0, 640, this);
     }
 
     public void paintPlayerMenu(Graphics g) {
@@ -634,7 +677,7 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
         g.drawImage(tex.getTexture(p2), 700, 160, 160, 160, this);
         g.drawImage(tex.getTexture(b2), 860, 160, 160, 160, this);
 
-        g.drawImage(tex.getTexture("Overlay"), 0, 640, this);
+        g.drawImage(tex.getTexture("PlayerMenu"), 0, 640, this);
     }
 
     public void paintPause(Graphics g) {
@@ -642,8 +685,8 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
         g.fillRect(0, 0, 1280, 640);
 
         g.setColor(Color.white);
-        g.setFont(new Font("Segoe UI", Font.PLAIN, 64));
-        g.drawString("Press ENTER to exit.", 300, 298); 
+        g.setFont(new Font("Bebas Neue", Font.PLAIN, 72));
+        g.drawString("Press ENTER to exit.", 400, 298); 
     }
 
     public void fillRect(Graphics g, Rectangle rect) {

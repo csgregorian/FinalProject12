@@ -31,6 +31,7 @@ IceBow-D
 IceBow-L
 IceBow-R
 IceBow-U
+Intro
 Link-D-0
 Link-D-1
 Link-L-0
@@ -39,7 +40,9 @@ Link-R-0
 Link-R-1
 Link-U-0
 Link-U-1
+MapMenu
 Overlay
+PlayerMenu
 Powerup-1
 Powerup-2
 Powerup-3
