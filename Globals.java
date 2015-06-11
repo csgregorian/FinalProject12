@@ -21,5 +21,5 @@ public interface Globals {
 	final static int NONE = 0, SPEED = 1, JUMP = 2, BULLET = 3, FLY = 4, AMMO = 5, TIME = 6;
 
     // Game states
-	final static int GAME = 0, INTRO = 1, PLAYERMENU = 2, MAPMENU = 3, PAUSE = 4, SCORE = 5;
+	final static int INTRO = 0, PLAYERMENU = 1, MAPMENU = 2, GAME = 3, PAUSE = 4, SCORE = 5;
 }

@@ -77,6 +77,8 @@ public class Player extends Rectangle implements Globals {
 
 		if (shoot_timer > 0) {
 			shoot_timer--;
+		} else {
+			arrows = 5;
 		}
 
 
@@ -310,7 +312,7 @@ public class Player extends Rectangle implements Globals {
 	public void shoot(int direction) {
 		arrows--;
 		last_input = direction;
-		shoot_timer = 30;
+		shoot_timer += 30;
 	}
 
 	public void hurt() {
