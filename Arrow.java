@@ -1,5 +1,5 @@
 /* Arrow.java
- *
+ * Damaging arrow entities. */
 
 import java.awt.*;
 import java.awt.event.*;
@@ -14,13 +14,13 @@ import java.util.Scanner;
 
 public class Arrow extends Rectangle implements Globals {
 
+	// Velocity
 	double velx = 0,
 		   vely = 0;
 
 	int direction;
 
 	boolean alive = true;
-
 
 	public Arrow(Player player, int dir) {
 		/* Constructs the arrow one tile over in the given direction
@@ -68,21 +68,22 @@ public class Arrow extends Rectangle implements Globals {
 			y = player.y - height;
 
 			vely = -player.arrowspeed;
-
-		} else {
-			System.err.println("Invalid direction");
 		}
 	}
 
 	public void move(Map map) {
+		/* Changes position each frame */
+
+		// Horizontal movement
 		if (velx > 0) {
 			// Moving right
 
-			// Checks each block for collision with the right side
+			// Each pixel -> each block
 			outer: {
 				for (int i = 0; i < velx; i++) {
 					for (Block b : map.blocks) {
 						if (b.intersects(this)) {
+							// Arrow disappears on block touch
 							alive = false;
 
 							break outer;
@@ -112,6 +113,7 @@ public class Arrow extends Rectangle implements Globals {
 			}
 		}
 
+		// Looping horizontally
 		if (x < 0) {
 			x += 1280;
 		} else
@@ -119,11 +121,8 @@ public class Arrow extends Rectangle implements Globals {
 			x -= 1280;
 		}
 
+		// Vertical movement
 		if (vely > 0) {
-			// Falling
-
-			// Labeled block acts as a for/else construct: if the player never
-			// collides with the ground, touch_down is set to true
 			outer: {
 				for (int i = 0; i < vely; i++) {
 					for (Block b : map.blocks) {
@@ -139,7 +138,6 @@ public class Arrow extends Rectangle implements Globals {
 			}
 		} else
 		if (vely < 0) {
-			// Jumping
 			outer: {
 				for (int i = 0; i < -vely; i++) {
 					for (Block b : map.blocks) {
@@ -154,6 +152,7 @@ public class Arrow extends Rectangle implements Globals {
 			}
 		}
 
+		// Looping vertically
 		if (y < 0) {
 			y += 640;
 		} else
@@ -163,13 +162,17 @@ public class Arrow extends Rectangle implements Globals {
 	}
 
 	public BufferedImage getSprite(TextureManager tex) {
+		/* Returns texture */
 		String template = "%s-%s";
 		String name;
+
+		// Different texture if double the speed
 		if (Math.max(Math.abs(velx), Math.abs(vely)) == 32) {
 			name = "SpeedA";
 		} else {
 			name = "A";
 		}
+
 		switch (direction) {
 			case RIGHT:
 				return tex.getTexture(String.format(template, name, "R"));

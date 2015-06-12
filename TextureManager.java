@@ -1,3 +1,7 @@
+/* TextureManager.java
+ * Manages I/O for texture resources.
+ * Works as a sort of enhanced HashMap. */
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -20,7 +24,7 @@ public class TextureManager implements Globals {
 			image = ImageIO.read(new File(filename));
 			textures.put(name, image);
 		} catch (Exception e) {
-			System.err.print("Texture not found");
+			e.printStackTrace();
 			System.exit(0);
 		}
 	}

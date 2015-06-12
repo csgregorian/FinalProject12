@@ -1,3 +1,6 @@
+# Creates a list of images that need to be loaded into TextureManager
+# in the current directory.
+
 from os import listdir
 
 out = open("image_list.txt", "w")

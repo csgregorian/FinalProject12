@@ -1,3 +1,6 @@
+/* Map.java
+ * The stage and its associated powerup/collision data. */
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -10,15 +13,19 @@ import java.util.ArrayList;
 
 public class Map implements Globals {
 
-
+	// Collision
 	ArrayList<Block> blocks = new ArrayList<>();
+	
+	// Powerup spawn locations
 	ArrayList<Block> powerups = new ArrayList<>();
+
+	// Texture
 	String name;
 
 	public Map(String name) {
+		/* Opens the text file and converts to blocks and powerups */
+
 		this.name = name;
-		
-		blocks = new ArrayList<Block>();
 		String filename = String.format("res/maps/%s.txt", name);
 
 		BufferedReader block_file;
@@ -26,12 +33,16 @@ public class Map implements Globals {
 		try {
 			block_file = new BufferedReader(new FileReader(filename));
 
+			// Checks each column and row
 			for (int y = 0; y < TILEY; y++) {	
 				for (int x = 0; x < TILEX; x++) {
 					char c = (char)(block_file.read());
+
 					if (c == '\n') {
 						c = (char)(block_file.read());
+						// Flushes buffer and gets new character
 					}
+
 					if (c == 'O') {
 						blocks.add(new Block(x * TILESIZE, y * TILESIZE));
 					} else
@@ -40,10 +51,6 @@ public class Map implements Globals {
 					}
 				}
 			}
-
-
-
-			
 
 			block_file.close();
 
