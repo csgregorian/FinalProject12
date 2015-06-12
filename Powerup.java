@@ -1,3 +1,6 @@
+/* Powerup.java
+ * Special effect entity */
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -8,8 +11,10 @@ import javax.imageio.*;
 import java.util.HashMap;
 
 public class Powerup extends Rectangle implements Globals {
+	// Effect
 	int type;
 
+	// Lifetime
 	int timer = 300;
 	boolean alive = true;
 
@@ -23,6 +28,8 @@ public class Powerup extends Rectangle implements Globals {
 	}
 
 	public void tick() {
+		/* Kill me slowly */
+		
 		timer--;
 		if (timer <= 0) {
 			alive = false;

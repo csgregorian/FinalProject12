@@ -1,7 +1,9 @@
+/* Globals.java
+ * Shared global interface between all classes */
+
 import java.util.Random;
 
 public interface Globals {
-	/* Shared global interface between all classes */
 	// RNG
 	Random rng = new Random();
 

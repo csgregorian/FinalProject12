@@ -1,3 +1,6 @@
+/* Arrow.java
+ *
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -162,7 +165,7 @@ public class Arrow extends Rectangle implements Globals {
 	public BufferedImage getSprite(TextureManager tex) {
 		String template = "%s-%s";
 		String name;
-		if (Math.abs(Math.max(velx, vely)) == 32) {
+		if (Math.max(Math.abs(velx), Math.abs(vely)) == 32) {
 			name = "SpeedA";
 		} else {
 			name = "A";

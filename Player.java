@@ -1,3 +1,6 @@
+/* Player.java
+ * Represents the users character. */
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -8,6 +11,7 @@ import javax.imageio.*;
 import java.util.HashMap;
 
 public class Player extends Rectangle implements Globals {
+	// Sprite identifiers
 	String name;
 	String bow;
 
@@ -36,7 +40,7 @@ public class Player extends Rectangle implements Globals {
 	int arrowspeed = 16;
 
 	// Last input
-	int last_input = -1;
+	int last_input = RIGHT;
 
 	// Health
 	int hp = 4;
@@ -57,13 +61,18 @@ public class Player extends Rectangle implements Globals {
 		x = startx;
 		y = starty;
 
+		// PLAYERSIZE is a constant inherited from Globals
 		width = PLAYERSIZE;
 		height = PLAYERSIZE;
 
+		// Collisions default to false
 		touch_right = touch_left = touch_up = touch_down = false;
 	}
 
 	public void tick() {
+		/* Updates player each frame */
+
+		// Decreases powerup lifetime
 		if (powerup != NONE) {
 			powerup_timer--;
 			if (powerup_timer <= 0) {
@@ -71,10 +80,12 @@ public class Player extends Rectangle implements Globals {
 			}
 		}
 
+		// Invincibility
 		if (hurt_timer > 0) {
 			hurt_timer--;
 		}
 
+		// Arrow capacity
 		if (shoot_timer > 0) {
 			shoot_timer--;
 		} else {
@@ -82,6 +93,7 @@ public class Player extends Rectangle implements Globals {
 		}
 
 
+		// Lose condition check
 		if (hp <= 0) {
 			alive = false;
 		}
@@ -93,12 +105,8 @@ public class Player extends Rectangle implements Globals {
 
 		// Sets speed to a minimum value
 		if (direction == RIGHT) {
-			// If the player is in the air, halve their acceleration
-
 			velx = Math.max(velx, startvelx);
 			velx += accelx;
-
-
 		} else if (direction == LEFT) {
 			velx = Math.min(velx, -startvelx);
 			velx -= accelx;
@@ -129,8 +137,10 @@ public class Player extends Rectangle implements Globals {
 	}
 
 	public void jump() {
+		/* Sudden vertical acceleration */
+
 		if (powerup == FLY) {
-			// continue
+			// No jump limit
 		} else
 		if (jumps == 0) {
 			return;
@@ -140,6 +150,7 @@ public class Player extends Rectangle implements Globals {
 
 		vely = jumpy;
 
+		// Wall-kicking: sudden jump in opposite collision direction
 		if (!touch_down) {
 			if (touch_right) {
 				x--;
@@ -153,6 +164,8 @@ public class Player extends Rectangle implements Globals {
 	}
 
 	public void fall() {
+		/* Gravity effects */
+
 		vely += gravy;
 		if (vely > maxvely) {
 			vely = maxvely;
@@ -160,10 +173,13 @@ public class Player extends Rectangle implements Globals {
 	}
 
 	public void move(Map map) {
+		/* Position calculation */
+
+		// Horizontal movement
 		if (velx > 0) {
 			// Moving right
 
-			// Checks each block for collision with the right side
+			// Each pixel of movement, checks each block for collision
 			outer: {
 				for (int i = 0; i < velx; i++) {
 					for (Block b : map.blocks) {
@@ -176,6 +192,8 @@ public class Player extends Rectangle implements Globals {
 							}
 
 							touch_right = true;
+
+							// Adds another jump
 							jumps = Math.max(jumps, 1);
 
 							break outer;
@@ -185,6 +203,7 @@ public class Player extends Rectangle implements Globals {
 					// Moves right
 					x++;
 
+					// Looping if out of bounds
 					if (x < 0) {
 						x += 1280;
 					} else
@@ -240,9 +259,7 @@ public class Player extends Rectangle implements Globals {
 			}
 		}
 
-		// Horizontal loop adjustment
-		
-
+		// Vertical movement
 		if (vely > 0) {
 			// Falling
 
@@ -310,12 +327,14 @@ public class Player extends Rectangle implements Globals {
 	}
 
 	public void shoot(int direction) {
+		/* Run upon creation of a new arrow */
 		arrows--;
 		last_input = direction;
 		shoot_timer += 30;
 	}
 
 	public void hurt() {
+		/* Run upon collision with an arrow */
 		if (hurt_timer <= 0) {
 			hp--;
 			hurt_timer = 60;
@@ -324,13 +343,18 @@ public class Player extends Rectangle implements Globals {
 	}
 
 	public void knockback(Arrow a) {
+		/* The kinetic energy of the arrow is tranferred
+		 * to the player in the form of velocity. */
 		velx += a.velx;
 		vely += a.vely;
 	}
 
 	public void getPowerup(int type) {
+		/* Adds a buff to the player */
+
 		removePowerup();
 
+		// Applies appropriate passive effect
 		switch (type) {
 			case NONE:
 				break;
@@ -350,15 +374,10 @@ public class Player extends Rectangle implements Globals {
 				break;
 
 			case FLY:
-				break;
-
 			case AMMO:
-				break;
-
 			case TIME:
-				break;
-
 			default:
+				// Fallthrough: these are active effects
 				break;
 
 		}
@@ -368,6 +387,8 @@ public class Player extends Rectangle implements Globals {
 	}
 
 	public void removePowerup() {
+		/* Reverses buff effects */
+
 		switch (powerup) {
 			case NONE:
 				break;
@@ -387,15 +408,10 @@ public class Player extends Rectangle implements Globals {
 				break;
 
 			case FLY:
-				break;
-
 			case AMMO:
-				break;
-
 			case TIME:
-				break;
-
 			default:
+				// Fallthrough
 				break;
 		}
 
@@ -403,6 +419,7 @@ public class Player extends Rectangle implements Globals {
 		powerup = NONE;
 	}
 
+	/* Hitboxes for each side of the player */
 	public Rectangle rectRight() {
 		return new Rectangle(x + width, y, 1, height - 1);
 	}
@@ -420,6 +437,9 @@ public class Player extends Rectangle implements Globals {
 	}
 
 	public BufferedImage getSprite(TextureManager tex) {
+		/* Returns the relevant texture based on the player state */
+
+		// Flashes when invincible
 		if (hurt_timer > 0 && (hurt_timer % 8 / 4) == 0) {
 			return null;
 		}
@@ -440,6 +460,9 @@ public class Player extends Rectangle implements Globals {
 	}
 
 	public BufferedImage getBowSprite(TextureManager tex) {
+		/* Returns the relevant bow texture */
+
+		// Blank if no recent shot
 		if (shoot_timer <= 0) {
 			return null;
 		}
