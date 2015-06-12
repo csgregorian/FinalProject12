@@ -369,11 +369,11 @@ public class GamePanel extends JPanel implements KeyListener, Globals {
 					state = PAUSE;
 					break;
 
-				// // Uncomment to test item spawns
-				// case VK_Q:
-				//     Block place = map.powerups.get(rng.nextInt(map.powerups.size()));
-				//     powerups.add(new Powerup(place.x, place.y, rng.nextInt(6)));
-				//     break;
+				// Uncomment to test item spawns
+				case VK_Q:
+				    Block place = map.powerups.get(rng.nextInt(map.powerups.size()));
+				    powerups.add(new Powerup(place.x, place.y, rng.nextInt(6)));
+				    break;
 
 				case VK_X:
 					player1.jump();
