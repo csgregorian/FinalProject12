@@ -16,24 +16,24 @@ public class Player extends Rectangle implements Globals {
 	String bow;
 
 	// Velocity
-	double velx = 0,
-		   vely = 0,
-		   maxvelx = 6,
-		   maxvely = 50,
-	       startvelx = 3,
-	       startvely = 1;
+	private double velx = 0,
+		vely = 0,
+		maxvelx = 6,
+		maxvely = 50,
+    	startvelx = 3,
+    	startvely = 1;
 
 	// Acceleration/Deceleration
-	double accelx = 0.5,
-		   decelx = 1;
+	private double accelx = 0.5,
+		decelx = 1;
 
 	// Jump/Gravity
-	double jumpy = -7,
+	private double jumpy = -7,
 		   gravy = 0.3;
-	int jumps = 2;
+	private int jumps = 2;
 
 	// Collisions
-	boolean touch_right, touch_left, touch_up, touch_down;
+	private boolean touch_right, touch_left, touch_up, touch_down;
 
 	// Arrows
 	int arrows = 5;

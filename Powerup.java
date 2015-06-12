@@ -15,7 +15,7 @@ public class Powerup extends Rectangle implements Globals {
 	int type;
 
 	// Lifetime
-	int timer = 300;
+	private int timer = 300;
 	boolean alive = true;
 
 	public Powerup(int startx, int starty, int type) {
